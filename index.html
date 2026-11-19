@@ -25,11 +25,15 @@
     }
     .font-serif-tc { font-family: "Noto Serif TC", serif; }
     .font-en-serif { font-family: "Cormorant Garamond", serif; }
+    .price-num {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Noto Sans TC", sans-serif;
+      font-variant-numeric: tabular-nums lining-nums;
+    }
     input, textarea, select {
       user-select: text;
       font-size: 16px !important;
     }
-    .safe-top { padding-top: max(0.875rem, env(safe-area-inset-top)); }
+    .safe-top { padding-top: max(0.75rem, env(safe-area-inset-top)); }
     .safe-bottom { padding-bottom: max(5.5rem, env(safe-area-inset-bottom)); }
 
     @keyframes goldShimmer {
@@ -103,7 +107,6 @@
     ::-webkit-scrollbar-thumb { background: #D4C1B3; border-radius: 9999px; }
   </style>
   <script>
-    // 動態注入網頁分頁 Favicon、Apple Touch Icon 與 PWA Manifest（支援自訂 Logo 同步更新）
     window.applyDynamicBrandIcons = function (customDataUrl) {
       const applyLinks = (hrefUrl) => {
         document.querySelectorAll('link[data-willa-icon]').forEach(el => el.remove());
@@ -197,13 +200,13 @@
       </div>
     </transition>
 
-    <!-- 頂部高訂導覽列 -->
-    <header class="shrink-0 px-4 sm:px-8 py-3.5 safe-top bg-[#FCFBF9]/95 backdrop-blur-md border-b border-[#E5D9CE] flex items-center justify-between z-20">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-full p-[1.5px] liquid-gold-ring shadow-sm shrink-0">
+    <!-- 頂部高訂導覽列（針對手機與桌面精準適配） -->
+    <header class="shrink-0 px-3.5 sm:px-8 py-3 safe-top bg-[#FCFBF9]/95 backdrop-blur-md border-b border-[#E5D9CE] flex items-center justify-between gap-2 z-20">
+      <div class="flex items-center gap-2.5 min-w-0 flex-1">
+        <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full p-[1.5px] liquid-gold-ring shadow-sm shrink-0">
           <div class="w-full h-full rounded-full bg-[#FCFBF9] flex items-center justify-center overflow-hidden">
             <img v-if="state.customLogo" :src="state.customLogo" alt="Willa Logo" class="w-full h-full object-cover" />
-            <svg v-else viewBox="0 0 100 100" class="w-8 h-8">
+            <svg v-else viewBox="0 0 100 100" class="w-full h-full">
               <defs>
                 <radialGradient id="hdrLogoBg" cx="50%" cy="42%" r="58%">
                   <stop offset="0%" stop-color="#FFFDFD"/>
@@ -220,21 +223,22 @@
             </svg>
           </div>
         </div>
-        <div>
-          <div class="flex items-center gap-2">
-            <h1 class="text-base sm:text-lg font-bold tracking-[0.14em] text-[#231D1B] font-serif-tc">Willa 生活美學</h1>
-            <span class="hidden sm:inline-block text-[10px] px-2.5 py-0.5 rounded-full font-semibold tracking-wider" :class="cloudConnected ? 'bg-[#EDF3EF] text-[#2E5E42] border border-[#C7D9CE]' : 'champagne-tag'">
+        <div class="min-w-0">
+          <div class="flex items-center gap-1.5">
+            <h1 class="text-[15px] sm:text-lg font-bold tracking-[0.1em] sm:tracking-[0.14em] text-[#231D1B] font-serif-tc truncate">Willa 生活美學</h1>
+            <span class="hidden md:inline-block text-[10px] px-2.5 py-0.5 rounded-full font-semibold tracking-wider shrink-0" :class="cloudConnected ? 'bg-[#EDF3EF] text-[#2E5E42] border border-[#C7D9CE]' : 'champagne-tag'">
               {{ cloudConnected ? '● 雲端安全連線' : '○ 本機安全模式' }}
             </span>
           </div>
-          <p class="text-[11px] text-[#7A6D66] tracking-wider">台中腹直肌｜美胸｜溫罐舒壓｜孕婦按摩</p>
+          <p class="text-[10px] sm:text-[11px] text-[#7A6D66] tracking-wide truncate">台中腹直肌｜美胸｜溫罐舒壓｜孕婦按摩</p>
         </div>
       </div>
 
-      <nav class="flex items-center gap-1 bg-[#EFE9E1] p-1 rounded-full border border-[#E2D5C8]">
-        <button @click="view = 'book'" class="px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wider transition" :class="view === 'book' ? 'bg-[#231D1B] text-[#FAF6F0] shadow-sm' : 'text-[#665A54] hover:text-[#231D1B]'">預約</button>
-        <button @click="view = 'lookup'" class="px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wider transition" :class="view === 'lookup' ? 'bg-[#231D1B] text-[#FAF6F0] shadow-sm' : 'text-[#665A54] hover:text-[#231D1B]'">查詢</button>
-        <button @click="view = 'admin'" class="px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wider transition" :class="view === 'admin' ? 'bg-[#231D1B] text-[#FAF6F0] shadow-sm' : 'text-[#665A54] hover:text-[#231D1B]'">後台</button>
+      <!-- 精緻輕巧的單行膠囊選單 -->
+      <nav class="shrink-0 flex items-center gap-0.5 sm:gap-1 bg-[#EFE9E1] p-0.5 sm:p-1 rounded-full border border-[#E2D5C8]">
+        <button @click="view = 'book'" class="whitespace-nowrap px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-semibold tracking-wide transition" :class="view === 'book' ? 'bg-[#231D1B] text-[#FAF6F0] shadow-sm' : 'text-[#665A54] hover:text-[#231D1B]'">預約</button>
+        <button @click="view = 'lookup'" class="whitespace-nowrap px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-semibold tracking-wide transition" :class="view === 'lookup' ? 'bg-[#231D1B] text-[#FAF6F0] shadow-sm' : 'text-[#665A54] hover:text-[#231D1B]'">查詢</button>
+        <button @click="view = 'admin'" class="whitespace-nowrap px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-semibold tracking-wide transition" :class="view === 'admin' ? 'bg-[#231D1B] text-[#FAF6F0] shadow-sm' : 'text-[#665A54] hover:text-[#231D1B]'">後台</button>
       </nav>
     </header>
 
@@ -323,7 +327,7 @@
                       cell.hasSlots ? 'bg-white text-[#231D1B] border-[#DFC4B4] hover:border-[#B3816E] font-semibold shadow-sm' :
                       'bg-transparent text-[#B8ABA3] border-transparent'
                     ]">
-                    <span class="text-sm">{{ cell.day }}</span>
+                    <span class="text-sm price-num">{{ cell.day }}</span>
                     <span v-if="cell.hasSlots" class="w-1.5 h-1.5 rounded-full mt-0.5" :class="selectedDate === cell.dateStr ? 'bg-[#E5C4AE]' : 'bg-[#B3816E]'"></span>
                   </button>
                 </div>
@@ -339,7 +343,7 @@
                 </div>
                 <div v-else class="grid grid-cols-3 gap-2">
                   <button v-for="slot in slotsForSelectedDate" :key="slot.id" type="button" @click="form.slotId = slot.id"
-                    class="py-2.5 px-3 rounded-xl border text-sm font-bold tracking-wider transition"
+                    class="py-2.5 px-3 rounded-xl border text-sm font-bold tracking-wider price-num transition"
                     :class="form.slotId === slot.id ? 'liquid-gold-btn border-transparent' : 'bg-white text-[#231D1B] border-[#DFD2C6] hover:border-[#B3816E]'">
                     {{ slot.time }}
                   </button>
@@ -379,8 +383,8 @@
                     <h3 class="font-bold text-[#231D1B] text-[15px] leading-snug pt-0.5">{{ c.name }}</h3>
                     <div v-if="c.duration > 0" class="text-xs text-[#7A6D66]">⏱ 課程時間 {{ c.duration }} 分鐘</div>
                   </div>
-                  <div class="text-right shrink-0">
-                    <div class="text-lg font-bold gold-text-gradient font-en-serif tracking-wide">
+                  <div class="text-right shrink-0 pt-0.5">
+                    <div class="text-[17px] font-bold gold-text-gradient price-num tracking-tight">
                       {{ Number(c.price) === 0 ? 'Free' : '$' + Number(c.price).toLocaleString() }}
                     </div>
                   </div>
@@ -465,11 +469,11 @@
 
             <div v-if="selectedSlotObj && selectedCourseObj" class="p-4 rounded-2xl bg-[#231D1B] text-[#FAF6F0] text-xs space-y-1.5 border border-[#D4A68E]/60 shadow-inner">
               <div class="text-[#E5C4AE] font-bold tracking-wider">✦ 本次預約明細核對：</div>
-              <div>
+              <div class="price-num">
                 預約時段：<span class="font-bold">{{ selectedSlotObj.date }} {{ selectedSlotObj.time }}</span>
                 <span v-if="estimatedEndTime" class="text-[#E5C4AE]"> – {{ estimatedEndTime }}（預計 {{ selectedCourseObj.duration }} 分鐘）</span>
               </div>
-              <div>護理課程：<span class="font-bold">{{ selectedCourseObj.name }}</span>（{{ Number(selectedCourseObj.price) === 0 ? 'Free' : '$' + Number(selectedCourseObj.price).toLocaleString() }}）</div>
+              <div class="price-num">護理課程：<span class="font-bold">{{ selectedCourseObj.name }}</span>（{{ Number(selectedCourseObj.price) === 0 ? 'Free' : '$' + Number(selectedCourseObj.price).toLocaleString() }}）</div>
               <div>服務地點：<span class="font-bold">{{ form.locationType === 'studio' ? '私人工作室（遼陽四街39號3樓）' : '到府服務' }}</span></div>
             </div>
 
@@ -511,16 +515,16 @@
             <div class="flex justify-between items-center border-b border-[#EAE0D6] pb-3">
               <div>
                 <div class="text-[11px] text-[#7A6D66]">預約日期與時間</div>
-                <div class="text-base font-bold text-[#231D1B] font-serif-tc">{{ b.date }} {{ b.time }}</div>
+                <div class="text-base font-bold text-[#231D1B] price-num">{{ b.date }} {{ b.time }}</div>
               </div>
               <span class="px-3 py-1 rounded-full text-xs font-semibold" :class="b.paymentStatus === 'paid' ? 'bg-[#EDF3EF] text-[#2E5E42]' : b.paymentStatus === 'deposit' ? 'bg-[#EBF1F6] text-[#2C557A]' : 'champagne-tag'">
                 {{ paymentLabel(b.paymentStatus) }}
               </span>
             </div>
             <div class="text-sm space-y-1.5 text-[#4A403B]">
-              <div><span class="text-[#7A6D66]">預約課程：</span><span class="font-bold">{{ b.courseName }}</span>（{{ Number(b.price) === 0 ? 'Free' : '$' + Number(b.price).toLocaleString() }}）</div>
+              <div class="price-num"><span class="text-[#7A6D66]">預約課程：</span><span class="font-bold">{{ b.courseName }}</span>（{{ Number(b.price) === 0 ? 'Free' : '$' + Number(b.price).toLocaleString() }}）</div>
               <div><span class="text-[#7A6D66]">服務地點：</span>{{ b.locationType === 'studio' ? '工作室（台中市北屯區遼陽四街39號3樓）' : '到府（' + b.address + '）' }}</div>
-              <div><span class="text-[#7A6D66]">訂金後 4 碼：</span>{{ b.depositLast4 }}</div>
+              <div class="price-num"><span class="text-[#7A6D66]">訂金後 4 碼：</span>{{ b.depositLast4 }}</div>
               <div v-if="b.customerNote"><span class="text-[#7A6D66]">備註事項：</span>{{ b.customerNote }}</div>
             </div>
 
@@ -576,11 +580,11 @@
         <!-- 已登入管理面板 -->
         <div v-else class="space-y-5">
           <div class="flex items-center justify-between bg-[#231D1B] text-[#FAF6F0] p-4 rounded-2xl shadow-md border border-[#D4A68E]/60">
-            <div>
+            <div class="min-w-0 pr-2">
               <div class="text-[11px] text-[#E5C4AE]">已通過零信任權杖驗證管理員</div>
-              <div class="text-sm font-bold">{{ currentAdminUser }}</div>
+              <div class="text-sm font-bold truncate">{{ currentAdminUser }}</div>
             </div>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 shrink-0">
               <button @click="refreshAdminData(true)" class="px-3 py-1.5 rounded-xl bg-[#3A302D] text-xs font-medium border border-[#D4A68E]/30">↻ 同步</button>
               <button @click="logoutAdmin" class="px-3 py-1.5 rounded-xl liquid-gold-btn text-xs font-medium">安全登出</button>
             </div>
@@ -598,11 +602,11 @@
             <div class="grid grid-cols-2 gap-3">
               <div class="sanctuary-card p-4 rounded-2xl">
                 <div class="text-xs text-[#7A6D66]">本月已確認收款 ({{ currentMonthLabel }})</div>
-                <div class="text-xl font-bold text-[#2E5E42] mt-1 font-en-serif">NT$ {{ monthlyConfirmedRevenue.toLocaleString() }}</div>
+                <div class="text-lg sm:text-xl font-bold text-[#2E5E42] mt-1 price-num">NT$ {{ monthlyConfirmedRevenue.toLocaleString() }}</div>
               </div>
               <div class="sanctuary-card p-4 rounded-2xl">
                 <div class="text-xs text-[#7A6D66]">累積已收總營收</div>
-                <div class="text-xl font-bold gold-text-gradient mt-1 font-en-serif">NT$ {{ totalConfirmedRevenue.toLocaleString() }}</div>
+                <div class="text-lg sm:text-xl font-bold gold-text-gradient mt-1 price-num">NT$ {{ totalConfirmedRevenue.toLocaleString() }}</div>
               </div>
             </div>
 
@@ -618,15 +622,15 @@
             <div v-for="b in filteredAdminBookings" :key="b.id" class="sanctuary-card p-4 rounded-2xl space-y-3">
               <div class="flex justify-between items-start">
                 <div>
-                  <span class="inline-block px-2.5 py-0.5 rounded-lg bg-[#231D1B] text-[#FAF6F0] text-xs font-semibold">{{ b.date }} {{ b.time }}</span>
+                  <span class="inline-block px-2.5 py-0.5 rounded-lg bg-[#231D1B] text-[#FAF6F0] text-xs font-semibold price-num">{{ b.date }} {{ b.time }}</span>
                   <h3 class="font-bold text-base text-[#231D1B] mt-1.5 flex items-center gap-2">
                     <span>{{ b.customerName }}</span>
-                    <a :href="'tel:' + b.phone" class="text-xs font-semibold px-2 py-0.5 rounded-md champagne-tag">📞 {{ b.phone }}</a>
+                    <a :href="'tel:' + b.phone" class="text-xs font-semibold px-2 py-0.5 rounded-md champagne-tag price-num">📞 {{ b.phone }}</a>
                   </h3>
                 </div>
                 <div class="text-right">
-                  <div class="text-base font-bold gold-text-gradient">{{ Number(b.price) === 0 ? 'Free' : 'NT$ ' + Number(b.price).toLocaleString() }}</div>
-                  <div class="text-xs text-[#5E524C] font-medium">後4碼：{{ b.depositLast4 }}</div>
+                  <div class="text-base font-bold gold-text-gradient price-num">{{ Number(b.price) === 0 ? 'Free' : 'NT$ ' + Number(b.price).toLocaleString() }}</div>
+                  <div class="text-xs text-[#5E524C] font-medium price-num">後4碼：{{ b.depositLast4 }}</div>
                 </div>
               </div>
               <div class="text-xs text-[#4A403B] space-y-1 bg-[#F6F2EC] p-3 rounded-xl">
@@ -678,7 +682,7 @@
                 <label class="text-[11px] text-[#7A6D66] block mb-1.5">3. 點選要開放的常用時段（可複選）</label>
                 <div class="grid grid-cols-4 gap-1.5">
                   <button v-for="t in presetTimes" :key="t" type="button" @click="togglePresetTime(t)"
-                    class="py-2 rounded-xl text-xs font-semibold border transition"
+                    class="py-2 rounded-xl text-xs font-semibold border transition price-num"
                     :class="batchSlot.times.includes(t) ? 'bg-[#231D1B] text-white border-[#231D1B]' : 'bg-white text-[#5E524C] border-[#DFD2C6]'">
                     {{ t }}
                   </button>
@@ -694,7 +698,7 @@
             <div class="space-y-2">
               <div v-for="s in sortedSlots" :key="s.id" class="sanctuary-card flex items-center justify-between p-3.5 rounded-2xl">
                 <div>
-                  <span class="font-bold text-sm text-[#231D1B]">{{ s.date }} {{ s.time }}</span>
+                  <span class="font-bold text-sm text-[#231D1B] price-num">{{ s.date }} {{ s.time }}</span>
                   <span class="ml-2 text-xs px-2.5 py-0.5 rounded-full font-medium" :class="s.isBooked ? 'bg-[#EAE0D6] text-[#665A54]' : 'bg-[#EDF3EF] text-[#2E5E42]'">
                     {{ s.isBooked ? '已被預約' : '開放中' }}
                   </span>
@@ -738,13 +742,10 @@
 
           <!-- Tab 4: 品牌 Logo 編輯、匯款帳號 & 資安管理員設定 -->
           <div v-if="adminTab === 'security'" class="space-y-5">
-            <!-- 品牌 Logo 可視化自訂編輯器 -->
             <div class="sanctuary-card p-4 rounded-2xl space-y-3">
-              <div class="flex items-center justify-between">
-                <div>
-                  <h3 class="text-sm font-bold text-[#231D1B]">🎨 品牌 Logo 圖片自訂（同步網頁標籤與首頁）</h3>
-                  <p class="text-[11px] text-[#7A6D66] mt-0.5">支援 JPG / PNG，系統將自動裁切為高質感圓形標誌並同步雲端</p>
-                </div>
+              <div>
+                <h3 class="text-sm font-bold text-[#231D1B]">🎨 品牌 Logo 圖片自訂（同步網頁標籤與首頁）</h3>
+                <p class="text-[11px] text-[#7A6D66] mt-0.5">支援 JPG / PNG，系統將自動裁切為高質感圓形標誌並同步雲端</p>
               </div>
               <div class="flex items-center gap-4 bg-[#F6F2EC] p-3.5 rounded-2xl border border-[#E2D4C6]">
                 <div class="w-16 h-16 rounded-full p-[2px] liquid-gold-ring shrink-0 shadow-sm">
@@ -765,7 +766,6 @@
               </div>
             </div>
 
-            <!-- 匯款帳號設定 -->
             <div class="sanctuary-card p-4 rounded-2xl space-y-3">
               <h3 class="text-sm font-bold text-[#231D1B]">🏦 訂金匯款帳號設定（顯示於前台）</h3>
               <input v-model.trim="state.bankInfo" type="text" placeholder="例如：台新銀行 (812) 帳號：2888-10-0012345-6" class="w-full px-3 py-2.5 rounded-xl border border-[#D8C7B8] bg-white text-xs" />
@@ -773,7 +773,6 @@
               <button @click="savePublicConfig(true)" class="w-full py-2.5 rounded-xl obsidian-gold-btn text-xs font-semibold">儲存匯款帳號並同步</button>
             </div>
 
-            <!-- 修改密碼 -->
             <form @submit.prevent="changePassword" class="sanctuary-card p-4 rounded-2xl space-y-3">
               <h3 class="text-sm font-bold text-[#231D1B]">🔑 修改目前帳號密碼 ({{ currentAdminUser }})</h3>
               <input v-model="pwdForm.oldPwd" type="password" placeholder="輸入目前舊密碼" class="w-full px-3 py-2.5 rounded-xl border border-[#D8C7B8] bg-white" />
@@ -782,7 +781,6 @@
               <button type="submit" class="w-full py-2.5 rounded-xl obsidian-gold-btn text-xs font-semibold">更新高強度加鹽密碼</button>
             </form>
 
-            <!-- 新增管理員 -->
             <form @submit.prevent="addAdminUser" class="sanctuary-card p-4 rounded-2xl space-y-3">
               <h3 class="text-sm font-bold text-[#231D1B]">👤 新增工作人員 / 管理員帳號</h3>
               <input v-model.trim="newAdmin.username" type="text" placeholder="新管理員帳號（至少 3 碼）" class="w-full px-3 py-2.5 rounded-xl border border-[#D8C7B8] bg-white" />
@@ -797,7 +795,6 @@
               </div>
             </form>
 
-            <!-- 備份與還原 -->
             <div class="sanctuary-card p-4 rounded-2xl space-y-2.5">
               <h3 class="text-sm font-bold text-[#231D1B]">💾 系統資料備份與還原</h3>
               <div class="grid grid-cols-2 gap-2.5">
@@ -816,10 +813,10 @@
     <!-- 手機端懸浮底部流金確認條 -->
     <div v-if="view === 'book' && (selectedSlotObj || selectedCourseObj)" class="lg:hidden fixed bottom-0 inset-x-0 z-30 px-4 py-3 bg-[#231D1B]/95 backdrop-blur-md text-[#FAF6F0] border-t border-[#D4A68E]/50 flex items-center justify-between gap-3">
       <div class="min-w-0">
-        <div class="text-[11px] text-[#E5C4AE] truncate">
+        <div class="text-[11px] text-[#E5C4AE] truncate price-num">
           {{ selectedSlotObj ? `${selectedSlotObj.date} ${selectedSlotObj.time}` : '尚未選擇時段' }}
         </div>
-        <div class="text-xs font-bold truncate">
+        <div class="text-xs font-bold truncate price-num">
           {{ selectedCourseObj ? `${selectedCourseObj.name}・${Number(selectedCourseObj.price) === 0 ? 'Free' : '$' + Number(selectedCourseObj.price).toLocaleString()}` : '' }}
         </div>
       </div>
@@ -1122,7 +1119,6 @@
           try { localStorage.setItem('willa_spa_v2_final', JSON.stringify(state)); } catch (e) {}
         }, { deep: true });
 
-        // 上傳並自動壓縮裁切圓形 Logo 圖片
         const handleLogoUpload = (e) => {
           const file = e.target.files[0];
           if (!file) return;
