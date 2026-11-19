@@ -1,0 +1,1584 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>WILLA BEAUTY LIFE｜Willa 生活美學・私人預約制</title>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&family=Noto+Sans+TC:wght@400;500;600;700&family=Noto+Serif+TC:wght@500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    [v-cloak] { display: none !important; }
+    html { scroll-behavior: smooth; }
+    body {
+      background-color: #F6F2EC;
+      color: #231D1B;
+      overscroll-behavior-y: none;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      font-family: "Noto Sans TC", -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    .font-serif-tc { font-family: "Noto Serif TC", serif; }
+    .font-en-serif { font-family: "Cormorant Garamond", serif; }
+    input, textarea, select {
+      user-select: text;
+      font-size: 16px !important;
+    }
+    .safe-top { padding-top: max(0.875rem, env(safe-area-inset-top)); }
+    .safe-bottom { padding-bottom: max(5.5rem, env(safe-area-inset-bottom)); }
+
+    @keyframes goldShimmer {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-up { animation: fadeUp 0.35s ease-out both; }
+
+    .liquid-gold-bar {
+      background: linear-gradient(90deg, #D9B79C, #F3DEC9, #C3937D, #E8C7B3, #A67664);
+      background-size: 200% 200%;
+      animation: goldShimmer 8s ease infinite;
+    }
+    .liquid-gold-ring {
+      background: linear-gradient(135deg, #F4E1CE 0%, #D4A68E 38%, #A57564 72%, #E5C4AE 100%);
+    }
+    .liquid-gold-btn {
+      background: linear-gradient(135deg, #CFA28B 0%, #B3816E 48%, #8F5F50 100%);
+      color: #FFFDFB;
+      box-shadow: 0 10px 26px -6px rgba(143, 95, 80, 0.42), inset 0 1px 1px rgba(255, 245, 236, 0.65);
+      transition: all 0.2s ease;
+    }
+    .liquid-gold-btn:hover {
+      background: linear-gradient(135deg, #D7AC96 0%, #BC8A77 48%, #996859 100%);
+    }
+    .liquid-gold-btn:active { transform: scale(0.99); }
+
+    .obsidian-gold-btn {
+      background: linear-gradient(145deg, #2B2321 0%, #1C1716 100%);
+      color: #FAF6F0;
+      border: 1px solid rgba(212, 166, 142, 0.42);
+      box-shadow: 0 10px 24px -8px rgba(28, 23, 22, 0.38), inset 0 1px 0 rgba(244, 225, 206, 0.18);
+      transition: all 0.2s ease;
+    }
+    .obsidian-gold-btn:active { transform: scale(0.99); }
+
+    .sanctuary-card {
+      background: linear-gradient(180deg, rgba(255, 254, 252, 0.98) 0%, rgba(251, 247, 242, 0.95) 100%);
+      border: 1px solid #E5D9CE;
+      box-shadow: 0 14px 36px -16px rgba(68, 49, 41, 0.10), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    }
+    .champagne-tag {
+      background: linear-gradient(135deg, #FBF4EE 0%, #F3E5DA 100%);
+      border: 1px solid #DFC6B6;
+      color: #875C4B;
+    }
+    .hero-luxury-mesh {
+      background:
+        radial-gradient(circle at 6% 12%, rgba(228, 190, 164, 0.28) 0%, transparent 48%),
+        radial-gradient(circle at 92% 88%, rgba(196, 148, 130, 0.24) 0%, transparent 52%),
+        linear-gradient(155deg, #FFFDFB 0%, #F8F1EA 100%);
+      border: 1px solid #DFCBB9;
+      box-shadow: 0 16px 40px -18px rgba(143, 95, 80, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    }
+    .gold-text-gradient {
+      background: linear-gradient(135deg, #8F5F50 0%, #B88772 50%, #7C4F41 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .skeleton-shimmer {
+      background: linear-gradient(90deg, #EFE8E0 25%, #F8F3ED 50%, #EFE8E0 75%);
+      background-size: 200% 100%;
+      animation: goldShimmer 1.6s infinite;
+    }
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-thumb { background: #D4C1B3; border-radius: 9999px; }
+  </style>
+  <script>
+    // 動態注入網頁分頁 Favicon、Apple Touch Icon 與 PWA Manifest（支援自訂 Logo 同步更新）
+    window.applyDynamicBrandIcons = function (customDataUrl) {
+      const applyLinks = (hrefUrl) => {
+        document.querySelectorAll('link[data-willa-icon]').forEach(el => el.remove());
+
+        const fav = document.createElement('link');
+        fav.rel = 'icon';
+        fav.type = 'image/png';
+        fav.href = hrefUrl;
+        fav.setAttribute('data-willa-icon', '1');
+        document.head.appendChild(fav);
+
+        const appleIcon = document.createElement('link');
+        appleIcon.rel = 'apple-touch-icon';
+        appleIcon.sizes = '180x180';
+        appleIcon.href = hrefUrl;
+        appleIcon.setAttribute('data-willa-icon', '1');
+        document.head.appendChild(appleIcon);
+
+        const manifest = {
+          name: "Willa 生活美學｜私人預約制",
+          short_name: "Willa 生活美學",
+          start_url: ".",
+          display: "standalone",
+          background_color: "#F6F2EC",
+          theme_color: "#B3816E",
+          icons: [
+            { src: hrefUrl, sizes: "192x192", type: "image/png" },
+            { src: hrefUrl, sizes: "512x512", type: "image/png" }
+          ]
+        };
+        const mLink = document.createElement('link');
+        mLink.rel = 'manifest';
+        mLink.href = 'data:application/manifest+json;charset=utf-8,' + encodeURIComponent(JSON.stringify(manifest));
+        mLink.setAttribute('data-willa-icon', '1');
+        document.head.appendChild(mLink);
+      };
+
+      if (customDataUrl) {
+        applyLinks(customDataUrl);
+        return;
+      }
+
+      const svgString = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+          <defs>
+            <radialGradient id="bg" cx="50%" cy="42%" r="58%">
+              <stop offset="0%" stop-color="#FFFDFD"/>
+              <stop offset="65%" stop-color="#F8DFDC"/>
+              <stop offset="100%" stop-color="#EBC1BB"/>
+            </radialGradient>
+            <linearGradient id="rose" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#C57B84"/>
+              <stop offset="100%" stop-color="#9E5660"/>
+            </linearGradient>
+          </defs>
+          <rect width="512" height="512" rx="96" fill="url(#bg)"/>
+          <circle cx="256" cy="96" r="22" fill="url(#rose)"/>
+          <path d="M256 176 C210 138, 188 108, 218 98 C238 92, 256 114, 256 114 C256 114, 274 92, 294 98 C324 108, 302 138, 256 176 Z" fill="none" stroke="url(#rose)" stroke-width="11" stroke-linecap="round"/>
+          <path d="M144 222 C182 222, 212 200, 246 200 C282 200, 312 222, 364 212 C342 248, 294 264, 244 258 C196 252, 166 242, 144 222 Z" fill="url(#rose)"/>
+          <path d="M174 268 C226 282, 286 276, 332 260 C354 332, 342 422, 256 432 C170 422, 158 332, 174 268 Z" fill="#E3A3AC" opacity="0.78"/>
+          <text x="256" y="344" text-anchor="middle" fill="#9A525C" font-family="Georgia, serif" font-weight="700" font-size="70" letter-spacing="5">WILLA</text>
+          <text x="256" y="384" text-anchor="middle" fill="#884650" font-family="sans-serif" font-weight="700" font-size="22" letter-spacing="6">BEAUTY LIFE</text>
+        </svg>`;
+      const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(svgBlob);
+      const img = new Image();
+      img.onload = function () {
+        const canvas = document.createElement('canvas');
+        canvas.width = 512;
+        canvas.height = 512;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, 512, 512);
+        URL.revokeObjectURL(url);
+        applyLinks(canvas.toDataURL('image/png'));
+      };
+      img.src = url;
+    };
+    window.applyDynamicBrandIcons(null);
+  </script>
+</head>
+<body class="h-[100dvh] flex flex-col overflow-hidden bg-[#F6F2EC] text-[#231D1B]">
+  <div id="app" v-cloak class="h-full flex flex-col w-full max-w-5xl mx-auto bg-[#F6F2EC] lg:border-x lg:border-[#E3D6C9] relative">
+    <!-- 頂部流金微光飾條 -->
+    <div class="h-1 w-full liquid-gold-bar shrink-0"></div>
+
+    <!-- Toast 懸浮提示 -->
+    <transition enter-active-class="transition duration-200 ease-out" enter-from-class="opacity-0 -translate-y-3" enter-to-class="opacity-100 translate-y-0" leave-active-class="transition duration-150 ease-in" leave-from-class="opacity-100" leave-to-class="opacity-0">
+      <div v-if="toast.show" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-full shadow-2xl text-sm font-medium tracking-wide flex items-center gap-2 backdrop-blur-md border" :class="toast.type === 'error' ? 'bg-[#7A2E2E] text-white border-[#B96B6B]' : 'bg-[#231D1B] text-[#FAF6F0] border-[#D4A68E]'">
+        <span class="text-[#E5C4AE]">{{ toast.type === 'error' ? '!' : '✦' }}</span>
+        <span>{{ toast.message }}</span>
+      </div>
+    </transition>
+
+    <!-- 頂部高訂導覽列 -->
+    <header class="shrink-0 px-4 sm:px-8 py-3.5 safe-top bg-[#FCFBF9]/95 backdrop-blur-md border-b border-[#E5D9CE] flex items-center justify-between z-20">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full p-[1.5px] liquid-gold-ring shadow-sm shrink-0">
+          <div class="w-full h-full rounded-full bg-[#FCFBF9] flex items-center justify-center overflow-hidden">
+            <img v-if="state.customLogo" :src="state.customLogo" alt="Willa Logo" class="w-full h-full object-cover" />
+            <svg v-else viewBox="0 0 100 100" class="w-8 h-8">
+              <defs>
+                <radialGradient id="hdrLogoBg" cx="50%" cy="42%" r="58%">
+                  <stop offset="0%" stop-color="#FFFDFD"/>
+                  <stop offset="100%" stop-color="#F2D0CB"/>
+                </radialGradient>
+              </defs>
+              <circle cx="50" cy="50" r="48" fill="url(#hdrLogoBg)"/>
+              <circle cx="50" cy="19" r="4.5" fill="#B26B65"/>
+              <path d="M50 35 C41 28, 37 22, 43 20 C47 19, 50 23, 50 23 C50 23, 53 19, 57 20 C63 22, 59 28, 50 35 Z" fill="none" stroke="#B26B65" stroke-width="2.4"/>
+              <path d="M29 44 C37 44, 42 40, 48 40 C55 40, 61 44, 71 42 C67 49, 58 52, 48 51 C39 50, 33 48, 29 44 Z" fill="#B26B65"/>
+              <path d="M35 53 C45 55, 56 54, 65 51 C69 65, 67 82, 50 84 C33 82, 31 65, 35 53 Z" fill="#E3A3AC" opacity="0.78"/>
+              <text x="50" y="67" text-anchor="middle" fill="#9A525C" font-family="Georgia, serif" font-weight="700" font-size="14" letter-spacing="1">WILLA</text>
+              <text x="50" y="75" text-anchor="middle" fill="#884650" font-family="sans-serif" font-weight="600" font-size="4.6" letter-spacing="1.2">BEAUTY LIFE</text>
+            </svg>
+          </div>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-base sm:text-lg font-bold tracking-[0.14em] text-[#231D1B] font-serif-tc">Willa 生活美學</h1>
+            <span class="hidden sm:inline-block text-[10px] px-2.5 py-0.5 rounded-full font-semibold tracking-wider" :class="cloudConnected ? 'bg-[#EDF3EF] text-[#2E5E42] border border-[#C7D9CE]' : 'champagne-tag'">
+              {{ cloudConnected ? '● 雲端安全連線' : '○ 本機安全模式' }}
+            </span>
+          </div>
+          <p class="text-[11px] text-[#7A6D66] tracking-wider">台中腹直肌｜美胸｜溫罐舒壓｜孕婦按摩</p>
+        </div>
+      </div>
+
+      <nav class="flex items-center gap-1 bg-[#EFE9E1] p-1 rounded-full border border-[#E2D5C8]">
+        <button @click="view = 'book'" class="px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wider transition" :class="view === 'book' ? 'bg-[#231D1B] text-[#FAF6F0] shadow-sm' : 'text-[#665A54] hover:text-[#231D1B]'">預約</button>
+        <button @click="view = 'lookup'" class="px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wider transition" :class="view === 'lookup' ? 'bg-[#231D1B] text-[#FAF6F0] shadow-sm' : 'text-[#665A54] hover:text-[#231D1B]'">查詢</button>
+        <button @click="view = 'admin'" class="px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wider transition" :class="view === 'admin' ? 'bg-[#231D1B] text-[#FAF6F0] shadow-sm' : 'text-[#665A54] hover:text-[#231D1B]'">後台</button>
+      </nav>
+    </header>
+
+    <!-- 中間響應式滾動主內容區 -->
+    <main class="flex-1 overflow-y-auto px-4 sm:px-8 py-6 safe-bottom">
+      <!-- ==================== 前台 1：響應式雙欄預約系統 ==================== -->
+      <section v-if="view === 'book'" class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start animate-fade-up">
+        <!-- 左欄：品牌名片 + 月曆檔期 -->
+        <div class="lg:col-span-5 space-y-6 lg:sticky lg:top-0">
+          <!-- 高訂品牌名片 -->
+          <div class="hero-luxury-mesh rounded-3xl p-5 sm:p-6 space-y-4 relative overflow-hidden">
+            <div class="flex items-center gap-4">
+              <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full p-[2px] liquid-gold-ring shrink-0 shadow-md">
+                <div class="w-full h-full rounded-full bg-[#FCFBF9] flex items-center justify-center overflow-hidden">
+                  <img v-if="state.customLogo" :src="state.customLogo" alt="Willa 生活美學 Logo" class="w-full h-full object-cover" />
+                  <svg v-else viewBox="0 0 120 120" class="w-full h-full">
+                    <defs>
+                      <radialGradient id="heroLogoBg" cx="50%" cy="42%" r="58%">
+                        <stop offset="0%" stop-color="#FFFDFD"/>
+                        <stop offset="65%" stop-color="#F8DFDC"/>
+                        <stop offset="100%" stop-color="#EBC1BB"/>
+                      </radialGradient>
+                    </defs>
+                    <circle cx="60" cy="60" r="58" fill="url(#heroLogoBg)"/>
+                    <circle cx="60" cy="22" r="5" fill="#B26B65"/>
+                    <path d="M60 41 C49 32, 44 25, 51 23 C56 21.5, 60 26.5, 60 26.5 C60 26.5, 64 21.5, 69 23 C76 25, 71 32, 60 41 Z" fill="none" stroke="#B26B65" stroke-width="2.6"/>
+                    <path d="M34 52 C43 52, 50 47, 58 47 C66 47, 73 52, 85 49.5 C80 58, 69 62, 57 60.5 C46 59, 39 56.5, 34 52 Z" fill="#B26B65"/>
+                    <path d="M41 63 C53 66, 67 64.5, 78 61 C83 78, 80 99, 60 101 C40 99, 37 78, 41 63 Z" fill="#E3A3AC" opacity="0.78"/>
+                    <text x="60" y="80" text-anchor="middle" fill="#9A525C" font-family="Georgia, serif" font-weight="700" font-size="16.5" letter-spacing="1.2">WILLA</text>
+                    <text x="60" y="90" text-anchor="middle" fill="#884650" font-family="sans-serif" font-weight="600" font-size="5.4" letter-spacing="1.5">BEAUTY LIFE</text>
+                  </svg>
+                </div>
+              </div>
+              <div class="space-y-1">
+                <span class="inline-block px-2.5 py-0.5 rounded-full champagne-tag text-[11px] font-semibold tracking-wider">室長姿姿｜三寶媽 (1+2)</span>
+                <h2 class="text-base sm:text-lg font-bold font-serif-tc text-[#231D1B] leading-snug">走過孕期、生產到產後的每一個階段</h2>
+              </div>
+            </div>
+            <p class="text-xs text-[#5E524C] leading-relaxed">
+              更懂媽咪在不同時期真正需要的是什麼。主打<span class="font-bold gold-text-gradient">腹直肌課程</span>，從腹部狀態、核心使用感到日常習慣，陪妳慢慢找回舒服與支撐感；亦提供孕期到產後的放鬆保養與到府／工作室服務。
+            </p>
+            <div class="pt-1 flex flex-wrap gap-2">
+              <a href="https://www.instagram.com/willa02208/" target="_blank" class="flex-1 text-center py-2.5 px-3 rounded-xl bg-white border border-[#DFCBB9] text-xs font-semibold text-[#231D1B] hover:border-[#B3816E] transition shadow-sm">
+                📸 IG @willa02208
+              </a>
+              <a href="https://lin.ee/3o6UCFv" target="_blank" class="flex-1 text-center py-2.5 px-3 rounded-xl liquid-gold-btn text-xs font-semibold">
+                💬 官方 LINE 諮詢
+              </a>
+            </div>
+          </div>
+
+          <!-- 01. 互動式月曆預約 -->
+          <div class="sanctuary-card rounded-3xl p-5 sm:p-6 space-y-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="text-[10px] tracking-[0.22em] text-[#9E6E5D] font-bold uppercase">Step 01 ・ Calendar</span>
+                <h2 class="text-base font-bold font-serif-tc text-[#231D1B]">選擇預約日期與時段</h2>
+              </div>
+              <button @click="syncPublicData(true)" class="text-xs px-3 py-1.5 rounded-full champagne-tag font-semibold transition">↻ 更新檔期</button>
+            </div>
+
+            <div v-if="loadingCloud" class="space-y-3 py-2">
+              <div class="h-10 rounded-2xl skeleton-shimmer"></div>
+              <div class="grid grid-cols-7 gap-1.5">
+                <div v-for="n in 28" :key="n" class="aspect-square rounded-2xl skeleton-shimmer"></div>
+              </div>
+            </div>
+
+            <template v-else>
+              <div class="flex items-center justify-between bg-[#F4ECE3] px-4 py-2.5 rounded-2xl border border-[#E3D3C4]">
+                <button type="button" @click="changeMonth(-1)" class="w-8 h-8 rounded-full bg-white text-[#231D1B] flex items-center justify-center shadow-sm font-bold border border-[#E3D3C4]">‹</button>
+                <div class="font-serif-tc font-bold text-sm tracking-widest text-[#231D1B]">{{ calYear }} 年 {{ calMonth + 1 }} 月</div>
+                <button type="button" @click="changeMonth(1)" class="w-8 h-8 rounded-full bg-white text-[#231D1B] flex items-center justify-center shadow-sm font-bold border border-[#E3D3C4]">›</button>
+              </div>
+
+              <div class="grid grid-cols-7 text-center text-[11px] font-semibold text-[#8A7B73] tracking-wider">
+                <div v-for="w in ['日','一','二','三','四','五','六']" :key="w">{{ w }}</div>
+              </div>
+
+              <div class="grid grid-cols-7 gap-1.5">
+                <div v-for="(cell, idx) in calendarCells" :key="idx" class="aspect-square">
+                  <button v-if="cell.day" type="button" @click="selectCalendarDate(cell.dateStr)"
+                    class="w-full h-full rounded-2xl flex flex-col items-center justify-center relative transition border"
+                    :class="[
+                      selectedDate === cell.dateStr ? 'obsidian-gold-btn border-transparent font-bold' :
+                      cell.hasSlots ? 'bg-white text-[#231D1B] border-[#DFC4B4] hover:border-[#B3816E] font-semibold shadow-sm' :
+                      'bg-transparent text-[#B8ABA3] border-transparent'
+                    ]">
+                    <span class="text-sm">{{ cell.day }}</span>
+                    <span v-if="cell.hasSlots" class="w-1.5 h-1.5 rounded-full mt-0.5" :class="selectedDate === cell.dateStr ? 'bg-[#E5C4AE]' : 'bg-[#B3816E]'"></span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="pt-3 border-t border-[#EAE0D6] space-y-2.5">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="font-bold text-[#231D1B]">📅 {{ selectedDate }} 開放時段</span>
+                  <span class="text-[#8F5F50] font-medium">● 圓點代表可預約</span>
+                </div>
+                <div v-if="slotsForSelectedDate.length === 0" class="py-4 px-3 rounded-2xl bg-[#F6F2EC] text-center text-xs text-[#7A6D66] leading-relaxed">
+                  此日期暫無開放空檔，請點選帶有「圓點」的日期，或私訊 IG <a href="https://www.instagram.com/willa02208/" target="_blank" class="underline text-[#8F5F50] font-semibold">@willa02208</a> 詢問。
+                </div>
+                <div v-else class="grid grid-cols-3 gap-2">
+                  <button v-for="slot in slotsForSelectedDate" :key="slot.id" type="button" @click="form.slotId = slot.id"
+                    class="py-2.5 px-3 rounded-xl border text-sm font-bold tracking-wider transition"
+                    :class="form.slotId === slot.id ? 'liquid-gold-btn border-transparent' : 'bg-white text-[#231D1B] border-[#DFD2C6] hover:border-[#B3816E]'">
+                    {{ slot.time }}
+                  </button>
+                </div>
+              </div>
+            </template>
+          </div>
+        </div>
+
+        <!-- 右欄：課程選擇 + 服務地點 + 貴賓表單 -->
+        <div class="lg:col-span-7 space-y-6">
+          <!-- 02. 專屬護理課程選擇 -->
+          <div class="sanctuary-card rounded-3xl p-5 sm:p-6 space-y-4">
+            <div class="flex items-end justify-between border-b border-[#EFE6DC] pb-3">
+              <div>
+                <span class="text-[10px] tracking-[0.22em] text-[#9E6E5D] font-bold uppercase">Step 02 ・ Treatments</span>
+                <h2 class="text-base font-bold font-serif-tc text-[#231D1B]">選擇專屬護理課程</h2>
+              </div>
+              <span class="font-en-serif italic text-xs text-[#8F5F50]">{{ currentCategoryEn }}</span>
+            </div>
+
+            <div class="flex gap-1.5 overflow-x-auto pb-1 bg-[#EFE9E1] p-1.5 rounded-2xl border border-[#E3D6C9]">
+              <button v-for="cat in categories" :key="cat" type="button" @click="selectedCategory = cat"
+                class="px-3.5 py-1.5 rounded-xl text-xs font-semibold shrink-0 transition"
+                :class="selectedCategory === cat ? 'bg-white text-[#231D1B] shadow-sm border border-[#DFCBB9]' : 'text-[#665A54]'">
+                {{ cat }}
+              </button>
+            </div>
+
+            <div class="space-y-2.5">
+              <div v-for="c in filteredCourses" :key="c.id" @click="form.courseId = c.id"
+                class="p-4 rounded-2xl border transition cursor-pointer"
+                :class="form.courseId === c.id ? 'bg-[#FAF4EE] border-[#B3816E] ring-1 ring-[#B3816E] shadow-sm' : 'bg-white border-[#EAE0D6] hover:border-[#D4BFA9]'">
+                <div class="flex justify-between items-start gap-3">
+                  <div class="space-y-1">
+                    <span class="text-[10px] tracking-wider px-2.5 py-0.5 rounded-full champagne-tag font-semibold">{{ c.category }}</span>
+                    <h3 class="font-bold text-[#231D1B] text-[15px] leading-snug pt-0.5">{{ c.name }}</h3>
+                    <div v-if="c.duration > 0" class="text-xs text-[#7A6D66]">⏱ 課程時間 {{ c.duration }} 分鐘</div>
+                  </div>
+                  <div class="text-right shrink-0">
+                    <div class="text-lg font-bold gold-text-gradient font-en-serif tracking-wide">
+                      {{ Number(c.price) === 0 ? 'Free' : '$' + Number(c.price).toLocaleString() }}
+                    </div>
+                  </div>
+                </div>
+                <div v-if="c.notes" class="mt-3 pt-2.5 border-t border-[#EFE6DC] text-xs text-[#5E524C] leading-relaxed whitespace-pre-line">
+                  <span class="font-bold text-[#8F5F50]">✦ 課程注意事項：</span>{{ c.notes }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 03. 服務地點 -->
+          <div class="sanctuary-card rounded-3xl p-5 sm:p-6 space-y-4">
+            <div>
+              <span class="text-[10px] tracking-[0.22em] text-[#9E6E5D] font-bold uppercase">Step 03 ・ Location</span>
+              <h2 class="text-base font-bold font-serif-tc text-[#231D1B]">選擇服務地點</h2>
+            </div>
+            <div class="grid grid-cols-2 gap-3">
+              <button type="button" @click="form.locationType = 'studio'"
+                class="py-3 px-4 rounded-2xl border text-sm font-bold transition"
+                :class="form.locationType === 'studio' ? 'obsidian-gold-btn border-transparent' : 'bg-white text-[#5E524C] border-[#DFD2C6]'">
+                🏛️ 私人工作室
+              </button>
+              <button type="button" @click="form.locationType = 'home'"
+                class="py-3 px-4 rounded-2xl border text-sm font-bold transition"
+                :class="form.locationType === 'home' ? 'obsidian-gold-btn border-transparent' : 'bg-white text-[#5E524C] border-[#DFD2C6]'">
+                🚗 專人到府服務
+              </button>
+            </div>
+
+            <div v-if="form.locationType === 'studio'" class="p-4 rounded-2xl bg-[#F6F2EC] border border-[#E2D4C6] space-y-2">
+              <div class="text-xs font-semibold text-[#8F5F50]">工作室專屬地址（預約成功將為您保留靜謐空間）</div>
+              <div class="text-sm font-bold text-[#231D1B]">📍 台中市北屯區遼陽四街39號3樓</div>
+              <div class="flex gap-2 pt-1">
+                <button type="button" @click="copyText('台中市北屯區遼陽四街39號3樓', '已複製工作室地址')" class="px-3.5 py-1.5 rounded-xl bg-white border border-[#D8C7B8] text-xs font-semibold text-[#231D1B]">複製地址</button>
+                <a href="https://www.google.com/maps/search/?api=1&query=台中市北屯區遼陽四街39號3樓" target="_blank" class="px-3.5 py-1.5 rounded-xl obsidian-gold-btn text-xs font-semibold">開啟地圖導航 ↗</a>
+              </div>
+            </div>
+
+            <div v-else class="space-y-2">
+              <label class="block text-xs font-bold text-[#5E524C]">請填寫完整到府服務地址 *</label>
+              <input v-model.trim="form.address" type="text" maxlength="120" placeholder="例如：台中市北屯區..." class="w-full px-4 py-3 rounded-2xl border border-[#D8C7B8] bg-white focus:outline-none focus:border-[#B3816E]" />
+            </div>
+          </div>
+
+          <!-- 04. 貴賓資訊與訂金後 4 碼 -->
+          <form id="guest-form" @submit.prevent="submitBooking" class="sanctuary-card rounded-3xl p-5 sm:p-6 space-y-4">
+            <div>
+              <span class="text-[10px] tracking-[0.22em] text-[#9E6E5D] font-bold uppercase">Step 04 ・ Guest Details</span>
+              <h2 class="text-base font-bold font-serif-tc text-[#231D1B]">貴賓資訊與訂金確認</h2>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-bold text-[#5E524C] mb-1">預約人姓名 *</label>
+                <input v-model.trim="form.customerName" type="text" maxlength="30" placeholder="請輸入您的真實姓名" class="w-full px-4 py-3 rounded-2xl border border-[#D8C7B8] bg-white focus:outline-none focus:border-[#B3816E]" />
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-[#5E524C] mb-1">連絡電話 *（09 開頭 10 碼）</label>
+                <input v-model.trim="form.phone" type="tel" maxlength="10" placeholder="例如：0912345678" class="w-full px-4 py-3 rounded-2xl border border-[#D8C7B8] bg-white focus:outline-none focus:border-[#B3816E]" />
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-[#5E524C] mb-1">孕期週數／產後狀況／身體備註（選填）</label>
+              <input v-model.trim="form.customerNote" type="text" maxlength="150" placeholder="例如：產後2個月腹直肌評估、懷孕26週..." class="w-full px-4 py-3 rounded-2xl border border-[#D8C7B8] bg-white focus:outline-none focus:border-[#B3816E]" />
+            </div>
+
+            <div class="p-4 rounded-2xl bg-[#FAF4EE] border border-[#E2CCB9] space-y-2.5">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-[#8F5F50]">💳 訂金匯款帳號資訊</span>
+                <button v-if="state.bankAccount" type="button" @click="copyText(state.bankAccount, '已複製匯款帳號')" class="text-[11px] px-3 py-1 rounded-lg bg-white border border-[#D8C0AE] text-[#8F5F50] font-bold">複製帳號</button>
+              </div>
+              <div class="text-xs text-[#4A403B] font-medium bg-white px-3.5 py-2.5 rounded-xl border border-[#EAE0D6] leading-relaxed">
+                {{ state.bankInfo || '請加官方 LINE (lin.ee/3o6UCFv) 或私訊 IG @willa02208 索取匯款帳號，並於下方填寫帳號後 4 碼' }}
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-[#5E524C] mb-1">訂金匯款帳號後 4 碼 *（免費衛教可填 0000）</label>
+                <input v-model.trim="form.depositLast4" type="text" maxlength="10" placeholder="請輸入轉帳帳號後 4 碼" class="w-full px-4 py-3 rounded-2xl border border-[#D8C7B8] bg-white focus:outline-none focus:border-[#B3816E]" />
+              </div>
+            </div>
+
+            <div v-if="selectedSlotObj && selectedCourseObj" class="p-4 rounded-2xl bg-[#231D1B] text-[#FAF6F0] text-xs space-y-1.5 border border-[#D4A68E]/60 shadow-inner">
+              <div class="text-[#E5C4AE] font-bold tracking-wider">✦ 本次預約明細核對：</div>
+              <div>
+                預約時段：<span class="font-bold">{{ selectedSlotObj.date }} {{ selectedSlotObj.time }}</span>
+                <span v-if="estimatedEndTime" class="text-[#E5C4AE]"> – {{ estimatedEndTime }}（預計 {{ selectedCourseObj.duration }} 分鐘）</span>
+              </div>
+              <div>護理課程：<span class="font-bold">{{ selectedCourseObj.name }}</span>（{{ Number(selectedCourseObj.price) === 0 ? 'Free' : '$' + Number(selectedCourseObj.price).toLocaleString() }}）</div>
+              <div>服務地點：<span class="font-bold">{{ form.locationType === 'studio' ? '私人工作室（遼陽四街39號3樓）' : '到府服務' }}</span></div>
+            </div>
+
+            <button type="submit" :disabled="submitting" class="w-full py-4 rounded-2xl liquid-gold-btn font-bold tracking-[0.2em] text-base disabled:opacity-50">
+              {{ submitting ? '加密傳輸預約中...' : '確認送出預約' }}
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <!-- ==================== 前台 2：客戶查詢預約 ==================== -->
+      <section v-if="view === 'lookup'" class="max-w-xl mx-auto space-y-6 animate-fade-up">
+        <div class="p-6 rounded-3xl bg-[#231D1B] text-[#FAF6F0] space-y-2 shadow-lg border border-[#D4A68E]/50">
+          <div class="text-[11px] tracking-[0.22em] text-[#E5C4AE] uppercase">Private Inquiry</div>
+          <h2 class="text-lg font-bold font-serif-tc tracking-wider">自助預約進度查詢</h2>
+          <p class="text-xs text-[#D6CEC8] leading-relaxed">輸入預約時填寫的「預約人姓名」與「連絡電話」，系統將透過隱私安全通道核對並顯示您的專屬預約。</p>
+        </div>
+
+        <form @submit.prevent="handleLookup" class="sanctuary-card rounded-3xl p-5 sm:p-6 space-y-3.5">
+          <div>
+            <label class="block text-xs font-bold text-[#5E524C] mb-1">預約人姓名</label>
+            <input v-model.trim="lookupForm.name" type="text" placeholder="請輸入預約人姓名" class="w-full px-4 py-3 rounded-2xl border border-[#D8C7B8] bg-white focus:outline-none focus:border-[#B3816E]" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-[#5E524C] mb-1">連絡電話</label>
+            <input v-model.trim="lookupForm.phone" type="tel" maxlength="10" placeholder="請輸入連絡電話" class="w-full px-4 py-3 rounded-2xl border border-[#D8C7B8] bg-white focus:outline-none focus:border-[#B3816E]" />
+          </div>
+          <button type="submit" :disabled="lookingUp" class="w-full py-3.5 rounded-2xl liquid-gold-btn font-bold tracking-widest">
+            {{ lookingUp ? '安全查詢中...' : '查詢我的預約' }}
+          </button>
+        </form>
+
+        <div v-if="lookupSearched" class="space-y-4">
+          <div v-if="myBookings.length === 0" class="sanctuary-card p-6 rounded-3xl text-center space-y-1">
+            <p class="text-sm font-bold text-[#231D1B]">查無相符的預約紀錄</p>
+            <p class="text-xs text-[#7A6D66]">請確認姓名與電話是否與預約時完全一致</p>
+          </div>
+          <div v-for="b in myBookings" :key="b.id" class="sanctuary-card p-5 rounded-3xl space-y-3.5">
+            <div class="flex justify-between items-center border-b border-[#EAE0D6] pb-3">
+              <div>
+                <div class="text-[11px] text-[#7A6D66]">預約日期與時間</div>
+                <div class="text-base font-bold text-[#231D1B] font-serif-tc">{{ b.date }} {{ b.time }}</div>
+              </div>
+              <span class="px-3 py-1 rounded-full text-xs font-semibold" :class="b.paymentStatus === 'paid' ? 'bg-[#EDF3EF] text-[#2E5E42]' : b.paymentStatus === 'deposit' ? 'bg-[#EBF1F6] text-[#2C557A]' : 'champagne-tag'">
+                {{ paymentLabel(b.paymentStatus) }}
+              </span>
+            </div>
+            <div class="text-sm space-y-1.5 text-[#4A403B]">
+              <div><span class="text-[#7A6D66]">預約課程：</span><span class="font-bold">{{ b.courseName }}</span>（{{ Number(b.price) === 0 ? 'Free' : '$' + Number(b.price).toLocaleString() }}）</div>
+              <div><span class="text-[#7A6D66]">服務地點：</span>{{ b.locationType === 'studio' ? '工作室（台中市北屯區遼陽四街39號3樓）' : '到府（' + b.address + '）' }}</div>
+              <div><span class="text-[#7A6D66]">訂金後 4 碼：</span>{{ b.depositLast4 }}</div>
+              <div v-if="b.customerNote"><span class="text-[#7A6D66]">備註事項：</span>{{ b.customerNote }}</div>
+            </div>
+
+            <button type="button" @click="copyBookingReceipt(b)" class="w-full py-2.5 rounded-xl bg-[#EFE9E1] border border-[#DFCBB9] text-xs font-bold text-[#231D1B] hover:border-[#B3816E] transition">
+              📋 一鍵複製預約明細（方便傳送 LINE / IG 確認）
+            </button>
+
+            <div class="p-3.5 rounded-2xl bg-[#F6F2EC] border border-[#E2D4C6] text-xs text-[#5E524C] leading-relaxed space-y-2">
+              <div>⚠️ <span class="font-bold text-[#231D1B]">異動與取消說明：</span>為維護每位貴賓的專屬時段，線上系統不開放直接取消。如需更改時間或取消預約，請直接<span class="font-bold text-[#8F5F50]">致電工作室</span>、私訊 IG 或透過官方 LINE 由專人為您協助。</div>
+              <div class="flex gap-2">
+                <a href="https://www.instagram.com/willa02208/" target="_blank" class="px-3 py-1.5 rounded-xl bg-white border border-[#D8C7B8] text-[11px] font-bold text-[#231D1B]">私訊 IG @willa02208 ↗</a>
+                <a href="https://lin.ee/3o6UCFv" target="_blank" class="px-3 py-1.5 rounded-xl liquid-gold-btn text-[11px] font-bold">聯繫官方 LINE ↗</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 後台：高資安管理中心 ==================== -->
+      <section v-if="view === 'admin'" class="max-w-3xl mx-auto animate-fade-up">
+        <!-- 未登入狀態 -->
+        <div v-if="!isAdminLoggedIn" class="max-w-sm mx-auto pt-6 space-y-5">
+          <div class="text-center space-y-1.5">
+            <div class="w-16 h-16 rounded-full p-[2px] liquid-gold-ring mx-auto shadow-md overflow-hidden">
+              <div class="w-full h-full rounded-full bg-[#FCFBF9] flex items-center justify-center font-en-serif font-bold text-2xl gold-text-gradient overflow-hidden">
+                <img v-if="state.customLogo" :src="state.customLogo" alt="Logo" class="w-full h-full object-cover" />
+                <span v-else>W</span>
+              </div>
+            </div>
+            <h2 class="text-lg font-bold font-serif-tc tracking-wider pt-2">Willa 生活美學｜管理後台</h2>
+            <p class="text-xs text-[#7A6D66]">Bcrypt 慢速加鹽雜湊 ＋ 12H 時效性安全權杖</p>
+          </div>
+          <form @submit.prevent="handleAdminLogin" class="sanctuary-card p-6 rounded-3xl space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-[#5E524C] mb-1">管理員帳號</label>
+              <input v-model.trim="loginForm.username" type="text" placeholder="請輸入管理員帳號" class="w-full px-4 py-3 rounded-2xl border border-[#D8C7B8] bg-white focus:outline-none focus:border-[#B3816E]" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-[#5E524C] mb-1">登入密碼</label>
+              <div class="relative">
+                <input v-model="loginForm.password" :type="showLoginPwd ? 'text' : 'password'" placeholder="請輸入密碼" class="w-full pl-4 pr-12 py-3 rounded-2xl border border-[#D8C7B8] bg-white focus:outline-none focus:border-[#B3816E]" />
+                <button type="button" @click="showLoginPwd = !showLoginPwd" class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#7A6D66] px-2 py-1">
+                  {{ showLoginPwd ? '隱藏' : '顯示' }}
+                </button>
+              </div>
+            </div>
+            <button type="submit" :disabled="loggingIn || lockCountdown > 0" class="w-full py-3.5 rounded-2xl obsidian-gold-btn font-bold tracking-widest disabled:opacity-50">
+              {{ lockCountdown > 0 ? `安全鎖定中 (${lockCountdown}s)` : loggingIn ? '雲端加密驗證中...' : '安全驗證登入' }}
+            </button>
+          </form>
+        </div>
+
+        <!-- 已登入管理面板 -->
+        <div v-else class="space-y-5">
+          <div class="flex items-center justify-between bg-[#231D1B] text-[#FAF6F0] p-4 rounded-2xl shadow-md border border-[#D4A68E]/60">
+            <div>
+              <div class="text-[11px] text-[#E5C4AE]">已通過零信任權杖驗證管理員</div>
+              <div class="text-sm font-bold">{{ currentAdminUser }}</div>
+            </div>
+            <div class="flex items-center gap-2">
+              <button @click="refreshAdminData(true)" class="px-3 py-1.5 rounded-xl bg-[#3A302D] text-xs font-medium border border-[#D4A68E]/30">↻ 同步</button>
+              <button @click="logoutAdmin" class="px-3 py-1.5 rounded-xl liquid-gold-btn text-xs font-medium">安全登出</button>
+            </div>
+          </div>
+
+          <div class="flex gap-1.5 overflow-x-auto pb-1">
+            <button @click="adminTab = 'bookings'" class="px-3.5 py-2 rounded-xl text-xs font-semibold shrink-0" :class="adminTab === 'bookings' ? 'bg-[#231D1B] text-white' : 'bg-[#EFE9E1] text-[#5E524C]'">📋 預約與營收 ({{ sortedBookings.length }})</button>
+            <button @click="adminTab = 'slots'" class="px-3.5 py-2 rounded-xl text-xs font-semibold shrink-0" :class="adminTab === 'slots' ? 'bg-[#231D1B] text-white' : 'bg-[#EFE9E1] text-[#5E524C]'">🗓️ 排班開放時段</button>
+            <button @click="adminTab = 'courses'" class="px-3.5 py-2 rounded-xl text-xs font-semibold shrink-0" :class="adminTab === 'courses' ? 'bg-[#231D1B] text-white' : 'bg-[#EFE9E1] text-[#5E524C]'">💆 課程與注意事項</button>
+            <button @click="adminTab = 'security'" class="px-3.5 py-2 rounded-xl text-xs font-semibold shrink-0" :class="adminTab === 'security' ? 'bg-[#231D1B] text-white' : 'bg-[#EFE9E1] text-[#5E524C]'">🔐 品牌・帳務・資安</button>
+          </div>
+
+          <!-- Tab 1: 預約名單與營收統計 -->
+          <div v-if="adminTab === 'bookings'" class="space-y-4">
+            <div class="grid grid-cols-2 gap-3">
+              <div class="sanctuary-card p-4 rounded-2xl">
+                <div class="text-xs text-[#7A6D66]">本月已確認收款 ({{ currentMonthLabel }})</div>
+                <div class="text-xl font-bold text-[#2E5E42] mt-1 font-en-serif">NT$ {{ monthlyConfirmedRevenue.toLocaleString() }}</div>
+              </div>
+              <div class="sanctuary-card p-4 rounded-2xl">
+                <div class="text-xs text-[#7A6D66]">累積已收總營收</div>
+                <div class="text-xl font-bold gold-text-gradient mt-1 font-en-serif">NT$ {{ totalConfirmedRevenue.toLocaleString() }}</div>
+              </div>
+            </div>
+
+            <div class="flex gap-1.5 overflow-x-auto pb-1">
+              <button v-for="f in bookingFilters" :key="f.key" @click="bookingFilter = f.key"
+                class="px-3 py-1.5 rounded-full text-xs font-semibold shrink-0 border transition"
+                :class="bookingFilter === f.key ? 'bg-[#231D1B] text-white border-[#231D1B]' : 'bg-white text-[#5E524C] border-[#DFD2C6]'">
+                {{ f.label }}
+              </button>
+            </div>
+
+            <div v-if="filteredAdminBookings.length === 0" class="sanctuary-card p-8 text-center text-sm text-[#7A6D66] rounded-2xl">此分類目前無預約紀錄</div>
+            <div v-for="b in filteredAdminBookings" :key="b.id" class="sanctuary-card p-4 rounded-2xl space-y-3">
+              <div class="flex justify-between items-start">
+                <div>
+                  <span class="inline-block px-2.5 py-0.5 rounded-lg bg-[#231D1B] text-[#FAF6F0] text-xs font-semibold">{{ b.date }} {{ b.time }}</span>
+                  <h3 class="font-bold text-base text-[#231D1B] mt-1.5 flex items-center gap-2">
+                    <span>{{ b.customerName }}</span>
+                    <a :href="'tel:' + b.phone" class="text-xs font-semibold px-2 py-0.5 rounded-md champagne-tag">📞 {{ b.phone }}</a>
+                  </h3>
+                </div>
+                <div class="text-right">
+                  <div class="text-base font-bold gold-text-gradient">{{ Number(b.price) === 0 ? 'Free' : 'NT$ ' + Number(b.price).toLocaleString() }}</div>
+                  <div class="text-xs text-[#5E524C] font-medium">後4碼：{{ b.depositLast4 }}</div>
+                </div>
+              </div>
+              <div class="text-xs text-[#4A403B] space-y-1 bg-[#F6F2EC] p-3 rounded-xl">
+                <div><span class="font-bold">課程：</span>{{ b.courseName }}</div>
+                <div><span class="font-bold">地點：</span>{{ b.locationType === 'studio' ? '工作室（遼陽四街39號3樓）' : '到府：' + b.address }}</div>
+                <div v-if="b.customerNote"><span class="font-bold">客戶備註：</span>{{ b.customerNote }}</div>
+              </div>
+              <div class="flex items-center justify-between gap-2 pt-1">
+                <select v-model="b.paymentStatus" @change="updateBookingPayment(b)" class="px-3 py-2 rounded-xl border border-[#D8C7B8] text-xs font-semibold bg-white">
+                  <option value="unpaid">⏳ 未核對/未收款</option>
+                  <option value="deposit">💳 已收訂金</option>
+                  <option value="paid">✅ 已收全額款項</option>
+                </select>
+                <div class="flex gap-1.5">
+                  <button @click="copyBookingReceipt(b)" class="px-3 py-2 rounded-xl text-xs text-[#231D1B] bg-[#EFE9E1] font-medium">複製</button>
+                  <button @click="deleteBooking(b)" class="px-3 py-2 rounded-xl text-xs text-[#7A2E2E] bg-[#F8EBEB] font-medium">刪除</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab 2: 跨日批次排班開放時段 -->
+          <div v-if="adminTab === 'slots'" class="space-y-4">
+            <form @submit.prevent="addBatchSlots" class="sanctuary-card p-4 rounded-2xl space-y-3.5">
+              <h3 class="text-xs font-bold text-[#231D1B]">🗓️ 單日／跨日批次開放預約時段</h3>
+              <div class="grid grid-cols-2 gap-2.5">
+                <div>
+                  <label class="text-[11px] text-[#7A6D66] block mb-1">1. 起始日期</label>
+                  <input v-model="batchSlot.startDate" type="date" class="w-full px-3 py-2 rounded-xl border border-[#D8C7B8] bg-white text-sm" />
+                </div>
+                <div>
+                  <label class="text-[11px] text-[#7A6D66] block mb-1">結束日期（單日填同天）</label>
+                  <input v-model="batchSlot.endDate" type="date" class="w-full px-3 py-2 rounded-xl border border-[#D8C7B8] bg-white text-sm" />
+                </div>
+              </div>
+
+              <div>
+                <label class="text-[11px] text-[#7A6D66] block mb-1.5">2. 篩選星期（可複選）</label>
+                <div class="grid grid-cols-7 gap-1">
+                  <button v-for="(wName, wIdx) in ['日','一','二','三','四','五','六']" :key="wIdx" type="button" @click="toggleWeekday(wIdx)"
+                    class="py-1.5 rounded-lg text-xs font-bold border transition"
+                    :class="batchSlot.weekdays.includes(wIdx) ? 'bg-[#231D1B] text-white border-[#231D1B]' : 'bg-white text-[#665A54] border-[#DFD2C6]'">
+                    {{ wName }}
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label class="text-[11px] text-[#7A6D66] block mb-1.5">3. 點選要開放的常用時段（可複選）</label>
+                <div class="grid grid-cols-4 gap-1.5">
+                  <button v-for="t in presetTimes" :key="t" type="button" @click="togglePresetTime(t)"
+                    class="py-2 rounded-xl text-xs font-semibold border transition"
+                    :class="batchSlot.times.includes(t) ? 'bg-[#231D1B] text-white border-[#231D1B]' : 'bg-white text-[#5E524C] border-[#DFD2C6]'">
+                    {{ t }}
+                  </button>
+                </div>
+              </div>
+              <div class="flex gap-2 items-center">
+                <input v-model="batchSlot.customTime" type="time" class="flex-1 px-3 py-2 rounded-xl border border-[#D8C7B8] bg-white" />
+                <button type="button" @click="addCustomPresetTime" class="px-3 py-2.5 rounded-xl bg-[#EFE9E1] text-xs font-semibold text-[#231D1B]">+ 加入自訂時間</button>
+              </div>
+              <button type="submit" class="w-full py-3 rounded-xl liquid-gold-btn text-xs font-bold tracking-wider">確認開放並同步雲端</button>
+            </form>
+
+            <div class="space-y-2">
+              <div v-for="s in sortedSlots" :key="s.id" class="sanctuary-card flex items-center justify-between p-3.5 rounded-2xl">
+                <div>
+                  <span class="font-bold text-sm text-[#231D1B]">{{ s.date }} {{ s.time }}</span>
+                  <span class="ml-2 text-xs px-2.5 py-0.5 rounded-full font-medium" :class="s.isBooked ? 'bg-[#EAE0D6] text-[#665A54]' : 'bg-[#EDF3EF] text-[#2E5E42]'">
+                    {{ s.isBooked ? '已被預約' : '開放中' }}
+                  </span>
+                </div>
+                <button @click="removeSlot(s.id)" class="text-xs text-[#7A2E2E] px-2.5 py-1 rounded-lg bg-[#F8EBEB]">移除</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab 3: 課程項目與注意事項編輯 -->
+          <div v-if="adminTab === 'courses'" class="space-y-4">
+            <div class="flex gap-2">
+              <button @click="addCourse" class="flex-1 py-3 rounded-2xl border-2 border-dashed border-[#C7B3A3] text-xs font-bold text-[#5E524C] hover:border-[#231D1B]">+ 新增課程項目</button>
+              <button @click="savePublicConfig(true)" class="px-5 py-3 rounded-2xl liquid-gold-btn text-xs font-bold">儲存並同步</button>
+            </div>
+            <div v-for="(c, idx) in state.courses" :key="c.id" class="sanctuary-card p-4 rounded-2xl space-y-3">
+              <div class="flex justify-between items-center">
+                <span class="text-xs font-bold text-[#8F5F50]">課程 #{{ idx + 1 }}</span>
+                <button v-if="state.courses.length > 1" @click="removeCourse(c.id)" class="text-xs text-[#7A2E2E]">刪除</button>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <input v-model="c.category" type="text" placeholder="分類（例如：媽咪專屬）" class="px-3 py-2 rounded-xl border border-[#D8C7B8] text-xs bg-white" />
+                <input v-model="c.name" type="text" placeholder="課程名稱" class="px-3 py-2 rounded-xl border border-[#D8C7B8] text-sm font-bold bg-white" />
+              </div>
+              <div class="grid grid-cols-2 gap-2.5">
+                <div>
+                  <label class="text-[11px] text-[#7A6D66]">價位 (填 0 顯示 Free)</label>
+                  <input v-model.number="c.price" type="number" class="w-full px-3 py-2 rounded-xl border border-[#D8C7B8] text-sm bg-white" />
+                </div>
+                <div>
+                  <label class="text-[11px] text-[#7A6D66]">時長 (分鐘，0 為不顯示)</label>
+                  <input v-model.number="c.duration" type="number" class="w-full px-3 py-2 rounded-xl border border-[#D8C7B8] text-sm bg-white" />
+                </div>
+              </div>
+              <div>
+                <label class="text-[11px] text-[#7A6D66]">課程專屬注意事項（前台選擇時顯示）</label>
+                <textarea v-model="c.notes" rows="2" placeholder="輸入此課程的注意事項..." class="w-full px-3 py-2 rounded-xl border border-[#D8C7B8] text-sm bg-white"></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab 4: 品牌 Logo 編輯、匯款帳號 & 資安管理員設定 -->
+          <div v-if="adminTab === 'security'" class="space-y-5">
+            <!-- 品牌 Logo 可視化自訂編輯器 -->
+            <div class="sanctuary-card p-4 rounded-2xl space-y-3">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-sm font-bold text-[#231D1B]">🎨 品牌 Logo 圖片自訂（同步網頁標籤與首頁）</h3>
+                  <p class="text-[11px] text-[#7A6D66] mt-0.5">支援 JPG / PNG，系統將自動裁切為高質感圓形標誌並同步雲端</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-4 bg-[#F6F2EC] p-3.5 rounded-2xl border border-[#E2D4C6]">
+                <div class="w-16 h-16 rounded-full p-[2px] liquid-gold-ring shrink-0 shadow-sm">
+                  <div class="w-full h-full rounded-full bg-white overflow-hidden flex items-center justify-center">
+                    <img v-if="state.customLogo" :src="state.customLogo" alt="目前 Logo" class="w-full h-full object-cover" />
+                    <span v-else class="text-xs font-bold text-[#8F5F50]">預設徽章</span>
+                  </div>
+                </div>
+                <div class="flex-1 flex flex-wrap gap-2">
+                  <label class="px-4 py-2 rounded-xl obsidian-gold-btn text-xs font-semibold cursor-pointer">
+                    📷 上傳新 Logo 圖片
+                    <input type="file" accept="image/*" @change="handleLogoUpload" class="hidden" />
+                  </label>
+                  <button v-if="state.customLogo" type="button" @click="resetDefaultLogo" class="px-3.5 py-2 rounded-xl bg-white border border-[#D8C7B8] text-xs font-semibold text-[#7A2E2E]">
+                    恢復預設徽章
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 匯款帳號設定 -->
+            <div class="sanctuary-card p-4 rounded-2xl space-y-3">
+              <h3 class="text-sm font-bold text-[#231D1B]">🏦 訂金匯款帳號設定（顯示於前台）</h3>
+              <input v-model.trim="state.bankInfo" type="text" placeholder="例如：台新銀行 (812) 帳號：2888-10-0012345-6" class="w-full px-3 py-2.5 rounded-xl border border-[#D8C7B8] bg-white text-xs" />
+              <input v-model.trim="state.bankAccount" type="text" placeholder="純數字帳號（供客戶一鍵複製，例如：28881000123456）" class="w-full px-3 py-2.5 rounded-xl border border-[#D8C7B8] bg-white text-xs" />
+              <button @click="savePublicConfig(true)" class="w-full py-2.5 rounded-xl obsidian-gold-btn text-xs font-semibold">儲存匯款帳號並同步</button>
+            </div>
+
+            <!-- 修改密碼 -->
+            <form @submit.prevent="changePassword" class="sanctuary-card p-4 rounded-2xl space-y-3">
+              <h3 class="text-sm font-bold text-[#231D1B]">🔑 修改目前帳號密碼 ({{ currentAdminUser }})</h3>
+              <input v-model="pwdForm.oldPwd" type="password" placeholder="輸入目前舊密碼" class="w-full px-3 py-2.5 rounded-xl border border-[#D8C7B8] bg-white" />
+              <input v-model="pwdForm.newPwd" type="password" placeholder="輸入新密碼（至少 6 碼）" class="w-full px-3 py-2.5 rounded-xl border border-[#D8C7B8] bg-white" />
+              <input v-model="pwdForm.confirmPwd" type="password" placeholder="再次確認新密碼" class="w-full px-3 py-2.5 rounded-xl border border-[#D8C7B8] bg-white" />
+              <button type="submit" class="w-full py-2.5 rounded-xl obsidian-gold-btn text-xs font-semibold">更新高強度加鹽密碼</button>
+            </form>
+
+            <!-- 新增管理員 -->
+            <form @submit.prevent="addAdminUser" class="sanctuary-card p-4 rounded-2xl space-y-3">
+              <h3 class="text-sm font-bold text-[#231D1B]">👤 新增工作人員 / 管理員帳號</h3>
+              <input v-model.trim="newAdmin.username" type="text" placeholder="新管理員帳號（至少 3 碼）" class="w-full px-3 py-2.5 rounded-xl border border-[#D8C7B8] bg-white" />
+              <input v-model="newAdmin.password" type="password" placeholder="設定初始密碼（至少 6 碼）" class="w-full px-3 py-2.5 rounded-xl border border-[#D8C7B8] bg-white" />
+              <button type="submit" class="w-full py-2.5 rounded-xl obsidian-gold-btn text-xs font-semibold">+ 新增管理員</button>
+              <div class="pt-2 border-t border-[#EAE0D6] space-y-1.5">
+                <div class="text-xs text-[#7A6D66]">現有管理員清單：</div>
+                <div v-for="u in adminList" :key="u" class="flex justify-between items-center text-xs bg-[#F6F2EC] px-3 py-2 rounded-lg">
+                  <span class="font-semibold">{{ u }}</span>
+                  <button v-if="adminList.length > 1 && u !== currentAdminUser" type="button" @click="removeAdmin(u)" class="text-[#7A2E2E]">移除</button>
+                </div>
+              </div>
+            </form>
+
+            <!-- 備份與還原 -->
+            <div class="sanctuary-card p-4 rounded-2xl space-y-2.5">
+              <h3 class="text-sm font-bold text-[#231D1B]">💾 系統資料備份與還原</h3>
+              <div class="grid grid-cols-2 gap-2.5">
+                <button type="button" @click="exportBackup" class="py-2.5 rounded-xl bg-[#EFE9E1] text-[#231D1B] text-xs font-semibold">匯出 JSON 備份</button>
+                <label class="py-2.5 rounded-xl bg-[#EFE9E1] text-[#231D1B] text-xs font-semibold text-center cursor-pointer">
+                  匯入 JSON 還原
+                  <input type="file" accept=".json" @change="importBackup" class="hidden" />
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- 手機端懸浮底部流金確認條 -->
+    <div v-if="view === 'book' && (selectedSlotObj || selectedCourseObj)" class="lg:hidden fixed bottom-0 inset-x-0 z-30 px-4 py-3 bg-[#231D1B]/95 backdrop-blur-md text-[#FAF6F0] border-t border-[#D4A68E]/50 flex items-center justify-between gap-3">
+      <div class="min-w-0">
+        <div class="text-[11px] text-[#E5C4AE] truncate">
+          {{ selectedSlotObj ? `${selectedSlotObj.date} ${selectedSlotObj.time}` : '尚未選擇時段' }}
+        </div>
+        <div class="text-xs font-bold truncate">
+          {{ selectedCourseObj ? `${selectedCourseObj.name}・${Number(selectedCourseObj.price) === 0 ? 'Free' : '$' + Number(selectedCourseObj.price).toLocaleString()}` : '' }}
+        </div>
+      </div>
+      <button type="button" @click="scrollToGuestForm" class="shrink-0 px-4 py-2 rounded-full liquid-gold-btn text-xs font-bold tracking-wider">
+        前往填寫 ↓
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const BUILT_IN_SUPABASE_URL = "https://alfyooickvvvmwoggqzm.supabase.co";
+    const BUILT_IN_SUPABASE_KEY = "sb_publishable_oMQQWoZSHszuz8ZGDn5KOg_5AGaHA80";
+
+    const { createApp, ref, reactive, computed, watch, onMounted } = Vue;
+
+    async function sha256(text) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(text);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    createApp({
+      setup() {
+        const view = ref('book');
+        const adminTab = ref('bookings');
+        const loadingCloud = ref(true);
+        const submitting = ref(false);
+        const lookingUp = ref(false);
+        const loggingIn = ref(false);
+        const showLoginPwd = ref(false);
+        const cloudConnected = ref(false);
+        const isAdminLoggedIn = ref(false);
+        const currentAdminUser = ref('');
+        const adminSessionToken = ref('');
+        const lookupSearched = ref(false);
+        const selectedCategory = ref('全部');
+        const bookingFilter = ref('all');
+        const failedAttempts = ref(0);
+        const lockCountdown = ref(0);
+
+        const toast = reactive({ show: false, message: '', type: 'success' });
+        let toastTimer = null;
+        const showToast = (message, type = 'success') => {
+          toast.message = message;
+          toast.type = type;
+          toast.show = true;
+          clearTimeout(toastTimer);
+          toastTimer = setTimeout(() => { toast.show = false; }, 3000);
+        };
+
+        let supabaseClient = null;
+
+        const defaultCourses = [
+          { id: 'c1', category: '媽咪專屬', name: '孕婦舒壓按摩', duration: 0, price: 2200, notes: '呵護生命，也呵護妳。建議懷孕滿 12 週以上且產檢穩定之媽咪預約，請備註目前孕期週數。' },
+          { id: 'c2', category: '媽咪專屬', name: '產前泌乳衛教', duration: 0, price: 0, notes: '免費一對一產前泌乳觀念與準備指導，建議懷孕 32 週後預約。' },
+          { id: 'c3', category: '媽咪專屬', name: '產後開乳腺．塞奶疏通', duration: 0, price: 2500, notes: '溫和無痛手技疏通乳腺硬塊與脹奶不適，若有發燒或紅腫發炎請先就醫評估。' },
+          { id: 'c4', category: '媽咪專屬', name: '腹直肌（贈古法紮肚）', duration: 0, price: 2200, notes: '室長姿姿主打課程！從腹部狀態、核心使用感到日常習慣，陪妳找回舒服與支撐感（自然產滿2週、剖腹產滿4週且傷口癒合即可預約）。' },
+          { id: 'c5', category: '媽咪專屬', name: '退奶美胸', duration: 0, price: 1800, notes: '漸進式溫和排空與胸型緊緻護理，協助媽咪輕鬆度過離乳期。' },
+          { id: 'c6', category: '美胸護理', name: '柔韻美胸', duration: 50, price: 1480, notes: '溫柔雕塑．自信綻放。疏通胸部周圍循環與淋巴，改善胸悶與副乳緊繃。' },
+          { id: 'c7', category: '美胸護理', name: '甦活美胸', duration: 80, price: 2200, notes: '深度美胸雕塑與乳腺活絡調理，建議生理期結束後 3～7 天進行效果最佳。' },
+          { id: 'c8', category: '溫感植草舒活 SPA 系列', name: '頭．前胸．腰臀．腹部', duration: 60, price: 1600, notes: '植草溫養．身心重新平衡。針對久坐循環不良與核心深層放鬆。' },
+          { id: 'c9', category: '溫感植草舒活 SPA 系列', name: '頭．肩頸．全背．全手．前胸', duration: 60, price: 1800, notes: '上半身完整經絡釋壓，適合長期使用電腦、肩頸僵硬與睡眠品質不佳者。' },
+          { id: 'c10', category: '溫感植草舒活 SPA 系列', name: '頭．肩頸．全背．全手．前胸．後腿', duration: 90, price: 2200, notes: '全身深層溫感植草芳療調理，從頭到腳徹底釋放累積疲勞。' },
+          { id: 'c11', category: '溫感植草舒活 SPA 系列', name: '植草舒活大全餐', duration: 0, price: 2999, notes: '頂級全方位身心靈深度修護套餐，建議預留充裕時間享受完整療程。' },
+          { id: 'c12', category: '溫感植草舒活 SPA 系列', name: '肩頸能量放鬆', duration: 15, price: 399, notes: '快速局部舒緩緊繃肩頸，可單獨體驗或搭配其他課程加購。' },
+          { id: 'c13', category: '溫感植草舒活 SPA 系列', name: '後腿舒緩', duration: 20, price: 599, notes: '針對久站、運動後或下肢水腫進行深層肌筋膜放鬆。' }
+        ];
+
+        const todayObj = new Date();
+        const pad2 = (n) => String(n).padStart(2, '0');
+        const formatDate = (d) => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+        const nowDateTimeStr = () => {
+          const d = new Date();
+          return `${formatDate(d)} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+        };
+        const tomorrowObj = new Date(todayObj.getTime() + 86400000);
+        const dayAfterObj = new Date(todayObj.getTime() + 86400000 * 2);
+
+        const defaultState = {
+          courses: defaultCourses,
+          slots: [
+            { id: 's1', date: formatDate(tomorrowObj), time: '11:00', isBooked: false },
+            { id: 's2', date: formatDate(tomorrowObj), time: '14:30', isBooked: false },
+            { id: 's3', date: formatDate(dayAfterObj), time: '13:00', isBooked: false },
+            { id: 's4', date: formatDate(dayAfterObj), time: '18:30', isBooked: false }
+          ],
+          bookings: [],
+          localAdmins: [],
+          bankInfo: '',
+          bankAccount: '',
+          customLogo: ''
+        };
+
+        const loadLocalState = () => {
+          try {
+            const raw = localStorage.getItem('willa_spa_v2_final');
+            if (!raw) return JSON.parse(JSON.stringify(defaultState));
+            const parsed = JSON.parse(raw);
+            return {
+              courses: Array.isArray(parsed.courses) && parsed.courses.length ? parsed.courses : defaultCourses,
+              slots: Array.isArray(parsed.slots) ? parsed.slots : defaultState.slots,
+              bookings: Array.isArray(parsed.bookings) ? parsed.bookings : [],
+              localAdmins: Array.isArray(parsed.localAdmins) ? parsed.localAdmins : [],
+              bankInfo: parsed.bankInfo || '',
+              bankAccount: parsed.bankAccount || '',
+              customLogo: parsed.customLogo || ''
+            };
+          } catch (e) {
+            return JSON.parse(JSON.stringify(defaultState));
+          }
+        };
+
+        const state = reactive(loadLocalState());
+        const cloudAdminUsernames = ref(['aun4h079@0988208506']);
+        const lookedUpResults = ref([]);
+
+        const adminList = computed(() => {
+          if (cloudConnected.value) return cloudAdminUsernames.value;
+          return state.localAdmins.map(a => a.username);
+        });
+
+        const calYear = ref(todayObj.getFullYear());
+        const calMonth = ref(todayObj.getMonth());
+        const selectedDate = ref(formatDate(tomorrowObj));
+
+        const futureAvailableSlots = computed(() => {
+          const threshold = nowDateTimeStr();
+          return state.slots
+            .filter(s => !s.isBooked && `${s.date} ${s.time}` > threshold)
+            .sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`));
+        });
+
+        const jumpToEarliestAvailableDate = () => {
+          if (futureAvailableSlots.value.length > 0) {
+            const first = futureAvailableSlots.value[0].date;
+            selectedDate.value = first;
+            const [y, m] = first.split('-').map(Number);
+            calYear.value = y;
+            calMonth.value = m - 1;
+          }
+        };
+
+        const changeMonth = (delta) => {
+          let m = calMonth.value + delta;
+          let y = calYear.value;
+          if (m > 11) { m = 0; y++; }
+          if (m < 0) { m = 11; y--; }
+          calMonth.value = m;
+          calYear.value = y;
+        };
+
+        const availableDateSet = computed(() => {
+          const set = new Set();
+          futureAvailableSlots.value.forEach(s => set.add(s.date));
+          return set;
+        });
+
+        const calendarCells = computed(() => {
+          const firstDay = new Date(calYear.value, calMonth.value, 1).getDay();
+          const daysInMonth = new Date(calYear.value, calMonth.value + 1, 0).getDate();
+          const cells = [];
+          for (let i = 0; i < firstDay; i++) cells.push({ day: null });
+          for (let d = 1; d <= daysInMonth; d++) {
+            const dateStr = `${calYear.value}-${pad2(calMonth.value + 1)}-${pad2(d)}`;
+            cells.push({ day: d, dateStr, hasSlots: availableDateSet.value.has(dateStr) });
+          }
+          return cells;
+        });
+
+        const selectCalendarDate = (dateStr) => {
+          selectedDate.value = dateStr;
+          form.slotId = '';
+        };
+
+        const slotsForSelectedDate = computed(() => {
+          return futureAvailableSlots.value.filter(s => s.date === selectedDate.value);
+        });
+
+        const categories = computed(() => {
+          const cats = new Set(state.courses.map(c => c.category || '精選課程'));
+          return ['全部', ...Array.from(cats)];
+        });
+
+        const currentCategoryEn = computed(() => {
+          if (selectedCategory.value.includes('媽咪')) return 'Maternity & Postpartum Care';
+          if (selectedCategory.value.includes('美胸')) return 'Bust Aesthetics';
+          if (selectedCategory.value.includes('植草')) return 'Warm Herbal Spa';
+          return 'Bespoke Sanctuary Menu';
+        });
+
+        const filteredCourses = computed(() => {
+          if (selectedCategory.value === '全部') return state.courses;
+          return state.courses.filter(c => (c.category || '精選課程') === selectedCategory.value);
+        });
+
+        const form = reactive({
+          slotId: '',
+          courseId: state.courses[3]?.id || state.courses[0]?.id || '',
+          locationType: 'studio',
+          address: '',
+          customerName: '',
+          phone: '',
+          customerNote: '',
+          depositLast4: ''
+        });
+
+        const selectedSlotObj = computed(() => state.slots.find(s => s.id === form.slotId));
+        const selectedCourseObj = computed(() => state.courses.find(c => c.id === form.courseId));
+
+        const estimatedEndTime = computed(() => {
+          if (!selectedSlotObj.value || !selectedCourseObj.value || !selectedCourseObj.value.duration) return '';
+          const [hh, mm] = selectedSlotObj.value.time.split(':').map(Number);
+          const totalMins = hh * 60 + mm + Number(selectedCourseObj.value.duration);
+          const endH = Math.floor(totalMins / 60) % 24;
+          const endM = totalMins % 60;
+          return `${pad2(endH)}:${pad2(endM)}`;
+        });
+
+        const scrollToGuestForm = () => {
+          const el = document.getElementById('guest-form');
+          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        };
+
+        const lookupForm = reactive({ name: '', phone: '' });
+        const loginForm = reactive({ username: '', password: '' });
+        const batchSlot = reactive({
+          startDate: formatDate(tomorrowObj),
+          endDate: formatDate(tomorrowObj),
+          weekdays: [0, 1, 2, 3, 4, 5, 6],
+          times: ['11:00', '14:30'],
+          customTime: ''
+        });
+        const presetTimes = ref(['10:00', '11:00', '13:00', '14:30', '16:00', '18:30', '20:00']);
+        const pwdForm = reactive({ oldPwd: '', newPwd: '', confirmPwd: '' });
+        const newAdmin = reactive({ username: '', password: '' });
+
+        const sortedSlots = computed(() => [...state.slots].sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`)));
+        const sortedBookings = computed(() => [...state.bookings].sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`)));
+
+        const bookingFilters = [
+          { key: 'all', label: '全部訂單' },
+          { key: 'unpaid', label: '⏳ 待核對訂金' },
+          { key: 'upcoming', label: '📅 即將到來' },
+          { key: 'past', label: '🗂️ 歷史紀錄' }
+        ];
+
+        const filteredAdminBookings = computed(() => {
+          const todayStr = formatDate(new Date());
+          if (bookingFilter.value === 'unpaid') return sortedBookings.value.filter(b => b.paymentStatus === 'unpaid');
+          if (bookingFilter.value === 'upcoming') return sortedBookings.value.filter(b => b.date >= todayStr);
+          if (bookingFilter.value === 'past') return sortedBookings.value.filter(b => b.date < todayStr);
+          return sortedBookings.value;
+        });
+
+        const myBookings = computed(() => {
+          if (!lookupSearched.value) return [];
+          if (cloudConnected.value) return lookedUpResults.value;
+          return sortedBookings.value.filter(b => b.customerName === lookupForm.name && b.phone === lookupForm.phone);
+        });
+
+        const currentMonthPrefix = formatDate(new Date()).slice(0, 7);
+        const currentMonthLabel = `${new Date().getMonth() + 1}月`;
+
+        const monthlyConfirmedRevenue = computed(() => {
+          return state.bookings
+            .filter(b => b.date.startsWith(currentMonthPrefix) && (b.paymentStatus === 'paid' || b.paymentStatus === 'deposit'))
+            .reduce((sum, b) => sum + (Number(b.price) || 0), 0);
+        });
+
+        const totalConfirmedRevenue = computed(() => {
+          return state.bookings
+            .filter(b => b.paymentStatus === 'paid' || b.paymentStatus === 'deposit')
+            .reduce((sum, b) => sum + (Number(b.price) || 0), 0);
+        });
+
+        const paymentLabel = (status) => {
+          if (status === 'paid') return '已收全額款項';
+          if (status === 'deposit') return '已收訂金確認';
+          return '訂金待核對';
+        };
+
+        const copyText = async (text, msg) => {
+          try {
+            await navigator.clipboard.writeText(text);
+            showToast(msg);
+          } catch (e) {
+            showToast('複製失敗，請手動選取', 'error');
+          }
+        };
+
+        const copyBookingReceipt = (b) => {
+          const locText = b.locationType === 'studio' ? '私人工作室（台中市北屯區遼陽四街39號3樓）' : `到府服務（${b.address}）`;
+          const priceText = Number(b.price) === 0 ? 'Free' : `NT$ ${Number(b.price).toLocaleString()}`;
+          const receipt = `【Willa 生活美學｜預約確認明細】\n預約時間：${b.date} ${b.time}\n護理課程：${b.courseName}（${priceText}）\n服務地點：${locText}\n預約貴賓：${b.customerName}（${b.phone}）\n訂金後4碼：${b.depositLast4}\n狀態：${paymentLabel(b.paymentStatus)}`;
+          copyText(receipt, '已複製預約明細，可直接貼上給官方 LINE');
+        };
+
+        watch(state, () => {
+          try { localStorage.setItem('willa_spa_v2_final', JSON.stringify(state)); } catch (e) {}
+        }, { deep: true });
+
+        // 上傳並自動壓縮裁切圓形 Logo 圖片
+        const handleLogoUpload = (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            const img = new Image();
+            img.onload = async () => {
+              const canvas = document.createElement('canvas');
+              const size = 256;
+              canvas.width = size;
+              canvas.height = size;
+              const ctx = canvas.getContext('2d');
+              const minSide = Math.min(img.width, img.height);
+              const sx = (img.width - minSide) / 2;
+              const sy = (img.height - minSide) / 2;
+              ctx.drawImage(img, sx, sy, minSide, minSide, 0, 0, size, size);
+              const compressedDataUrl = canvas.toDataURL('image/png', 0.88);
+              state.customLogo = compressedDataUrl;
+              if (window.applyDynamicBrandIcons) window.applyDynamicBrandIcons(compressedDataUrl);
+              await savePublicConfig(false);
+              showToast('品牌 Logo 已更新並同步全站與網頁標籤');
+            };
+            img.src = ev.target.result;
+          };
+          reader.readAsDataURL(file);
+        };
+
+        const resetDefaultLogo = async () => {
+          state.customLogo = '';
+          if (window.applyDynamicBrandIcons) window.applyDynamicBrandIcons(null);
+          await savePublicConfig(false);
+          showToast('已恢復原廠預設向量徽章');
+        };
+
+        const initApp = async () => {
+          if (state.localAdmins.length === 0) {
+            const defaultHash = await sha256('willa02208');
+            state.localAdmins.push({ username: 'aun4h079@0988208506', passwordHash: defaultHash });
+          }
+          if (state.customLogo && window.applyDynamicBrandIcons) {
+            window.applyDynamicBrandIcons(state.customLogo);
+          }
+          try {
+            supabaseClient = window.supabase.createClient(BUILT_IN_SUPABASE_URL, BUILT_IN_SUPABASE_KEY);
+            await syncPublicData(false);
+          } catch (e) {
+            cloudConnected.value = false;
+          }
+          jumpToEarliestAvailableDate();
+          loadingCloud.value = false;
+        };
+
+        const syncPublicData = async (notify = true) => {
+          if (!supabaseClient) return;
+          try {
+            const { data, error } = await supabaseClient.from('willa_public').select('payload').eq('id', 'main').single();
+            if (error && error.code !== 'PGRST116') throw error;
+            cloudConnected.value = true;
+            if (data && data.payload) {
+              if (data.payload.courses) state.courses = data.payload.courses;
+              if (data.payload.slots) state.slots = data.payload.slots;
+              if (data.payload.bankInfo !== undefined) state.bankInfo = data.payload.bankInfo;
+              if (data.payload.bankAccount !== undefined) state.bankAccount = data.payload.bankAccount;
+              if (data.payload.customLogo !== undefined) {
+                state.customLogo = data.payload.customLogo;
+                if (window.applyDynamicBrandIcons) window.applyDynamicBrandIcons(state.customLogo || null);
+              }
+              if (notify) showToast('已同步最新課程與開放時段');
+            }
+          } catch (e) {
+            cloudConnected.value = false;
+            if (notify) showToast('尚未執行 SQL 建表，目前為本機安全模式', 'error');
+          }
+        };
+
+        const getPublicPayloadSnapshot = () => ({
+          courses: JSON.parse(JSON.stringify(state.courses)),
+          slots: JSON.parse(JSON.stringify(state.slots)),
+          bankInfo: state.bankInfo,
+          bankAccount: state.bankAccount,
+          customLogo: state.customLogo
+        });
+
+        const savePublicConfig = async (notify = false) => {
+          if (supabaseClient && cloudConnected.value) {
+            const { data, error } = await supabaseClient.rpc('admin_save_public_v2', {
+              p_token: adminSessionToken.value,
+              p_payload: getPublicPayloadSnapshot()
+            });
+            if (error || !data) {
+              showToast('登入權杖已過期，請重新登入', 'error');
+              logoutAdmin();
+              return;
+            }
+          }
+          if (notify) showToast('設定已加密同步至雲端');
+        };
+
+        const submitBooking = async () => {
+          if (!form.slotId) return showToast('請先在月曆選擇日期與預約時段', 'error');
+          if (!form.courseId) return showToast('請選擇預約課程', 'error');
+          if (form.locationType === 'home' && !form.address) return showToast('請填寫到府服務地址', 'error');
+          if (!form.customerName) return showToast('請填寫預約人姓名', 'error');
+          if (!/^09\d{8}$/.test(form.phone)) return showToast('請輸入正確的 10 碼手機號碼（09開頭）', 'error');
+          if (!form.depositLast4) return showToast('請填寫訂金匯款後 4 碼', 'error');
+
+          submitting.value = true;
+          if (supabaseClient && cloudConnected.value) await syncPublicData(false);
+
+          const slot = state.slots.find(s => s.id === form.slotId);
+          if (!slot || slot.isBooked) {
+            submitting.value = false;
+            return showToast('此時段剛被其他貴賓預約，請重選時段', 'error');
+          }
+          const course = state.courses.find(c => c.id === form.courseId);
+
+          const bookingObj = {
+            id: 'b_' + Date.now(),
+            slotId: slot.id,
+            date: slot.date,
+            time: slot.time,
+            courseName: course.name,
+            duration: course.duration,
+            price: course.price,
+            locationType: form.locationType,
+            address: form.locationType === 'home' ? form.address : '台中市北屯區遼陽四街39號3樓',
+            customerName: form.customerName,
+            phone: form.phone,
+            customerNote: form.customerNote,
+            depositLast4: form.depositLast4,
+            paymentStatus: 'unpaid',
+            createdAt: new Date().toISOString()
+          };
+
+          if (supabaseClient && cloudConnected.value) {
+            const { data, error } = await supabaseClient.rpc('public_submit_booking_v2', {
+              p_booking: bookingObj,
+              p_slot_id: slot.id
+            });
+            if (error || !data) {
+              submitting.value = false;
+              return showToast('此時段剛被搶先預約，請重選時段', 'error');
+            }
+            await syncPublicData(false);
+            const maskedBooking = {
+              ...bookingObj,
+              address: bookingObj.locationType === 'home' ? bookingObj.address.slice(0, 6) + '********' : bookingObj.address
+            };
+            lookedUpResults.value = [maskedBooking];
+          } else {
+            slot.isBooked = true;
+            state.bookings.push(bookingObj);
+          }
+
+          lookupForm.name = form.customerName;
+          lookupForm.phone = form.phone;
+          lookupSearched.value = true;
+          form.slotId = '';
+          form.depositLast4 = '';
+          form.customerNote = '';
+          submitting.value = false;
+          showToast('預約成功！已為您跳轉至預約明細');
+          view.value = 'lookup';
+        };
+
+        const handleLookup = async () => {
+          if (!lookupForm.name || !lookupForm.phone) return showToast('請輸入姓名與連絡電話', 'error');
+          lookingUp.value = true;
+          if (supabaseClient && cloudConnected.value) {
+            const { data, error } = await supabaseClient.rpc('public_lookup_booking_v2', {
+              p_name: lookupForm.name,
+              p_phone: lookupForm.phone
+            });
+            lookedUpResults.value = (!error && Array.isArray(data)) ? data : [];
+          }
+          lookupSearched.value = true;
+          lookingUp.value = false;
+        };
+
+        const handleAdminLogin = async () => {
+          if (lockCountdown.value > 0) return;
+          if (!loginForm.username || !loginForm.password) return showToast('請輸入帳號與密碼', 'error');
+          loggingIn.value = true;
+          const cleanUser = loginForm.username.trim();
+          const cleanPwd = loginForm.password.trim();
+
+          if (supabaseClient && cloudConnected.value) {
+            const { data: token, error } = await supabaseClient.rpc('admin_login_v2', {
+              p_user: cleanUser,
+              p_pass: cleanPwd
+            });
+            if (error || !token) {
+              loggingIn.value = false;
+              triggerFailLock();
+              return;
+            }
+            adminSessionToken.value = token;
+            isAdminLoggedIn.value = true;
+            currentAdminUser.value = cleanUser;
+            loginForm.password = '';
+            failedAttempts.value = 0;
+
+            await supabaseClient.rpc('admin_init_public_v2', {
+              p_token: token,
+              p_payload: getPublicPayloadSnapshot()
+            });
+            await refreshAdminData(false);
+            loggingIn.value = false;
+            showToast('零信任權杖驗證通過');
+            return;
+          }
+
+          const inputHash = await sha256(cleanPwd);
+          const matched = state.localAdmins.find(a => a.username === cleanUser && a.passwordHash === inputHash);
+          loggingIn.value = false;
+          if (!matched) {
+            triggerFailLock();
+            return;
+          }
+          isAdminLoggedIn.value = true;
+          currentAdminUser.value = matched.username;
+          loginForm.password = '';
+          failedAttempts.value = 0;
+          showToast('歡迎回來，' + matched.username);
+        };
+
+        const triggerFailLock = () => {
+          failedAttempts.value++;
+          if (failedAttempts.value >= 5) {
+            lockCountdown.value = 30;
+            showToast('連續錯誤 5 次，系統已安全鎖定 30 秒', 'error');
+            const timer = setInterval(() => {
+              lockCountdown.value--;
+              if (lockCountdown.value <= 0) {
+                clearInterval(timer);
+                failedAttempts.value = 0;
+              }
+            }, 1000);
+          } else {
+            showToast(`帳號或密碼錯誤（剩餘 ${5 - failedAttempts.value} 次嘗試）`, 'error');
+          }
+        };
+
+        const refreshAdminData = async (notify = true) => {
+          if (!supabaseClient || !cloudConnected.value) return;
+          await syncPublicData(false);
+          const { data } = await supabaseClient.rpc('admin_get_dashboard_v2', {
+            p_token: adminSessionToken.value
+          });
+          if (data) {
+            if (Array.isArray(data.bookings)) state.bookings = data.bookings;
+            if (Array.isArray(data.admins)) cloudAdminUsernames.value = data.admins;
+            if (notify) showToast('已同步最新訂單與帳務');
+          }
+        };
+
+        const logoutAdmin = () => {
+          isAdminLoggedIn.value = false;
+          currentAdminUser.value = '';
+          adminSessionToken.value = '';
+          state.bookings = [];
+          showToast('已安全銷毀權杖並登出');
+        };
+
+        const toggleWeekday = (wIdx) => {
+          const idx = batchSlot.weekdays.indexOf(wIdx);
+          if (idx > -1) batchSlot.weekdays.splice(idx, 1);
+          else batchSlot.weekdays.push(wIdx);
+        };
+
+        const togglePresetTime = (t) => {
+          const idx = batchSlot.times.indexOf(t);
+          if (idx > -1) batchSlot.times.splice(idx, 1);
+          else batchSlot.times.push(t);
+        };
+
+        const addCustomPresetTime = () => {
+          if (!batchSlot.customTime) return;
+          if (!presetTimes.value.includes(batchSlot.customTime)) presetTimes.value.push(batchSlot.customTime);
+          if (!batchSlot.times.includes(batchSlot.customTime)) batchSlot.times.push(batchSlot.customTime);
+          batchSlot.customTime = '';
+        };
+
+        const addBatchSlots = async () => {
+          if (!batchSlot.startDate || !batchSlot.endDate || batchSlot.times.length === 0 || batchSlot.weekdays.length === 0) {
+            return showToast('請確認日期區間、星期與時段皆已勾選', 'error');
+          }
+          const start = new Date(batchSlot.startDate + 'T00:00:00');
+          const end = new Date(batchSlot.endDate + 'T00:00:00');
+          if (end < start) return showToast('結束日期不可早於起始日期', 'error');
+          if ((end - start) / 86400000 > 62) return showToast('單次批次排班最多支援 60 天範圍', 'error');
+
+          let added = 0;
+          for (let cur = new Date(start); cur <= end; cur.setDate(cur.getDate() + 1)) {
+            if (!batchSlot.weekdays.includes(cur.getDay())) continue;
+            const dateStr = formatDate(cur);
+            batchSlot.times.forEach(t => {
+              const exists = state.slots.some(s => s.date === dateStr && s.time === t);
+              if (!exists) {
+                state.slots.push({ id: 's_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6), date: dateStr, time: t, isBooked: false });
+                added++;
+              }
+            });
+          }
+          await savePublicConfig(false);
+          showToast(`已成功批次開放 ${added} 個預約時段`);
+        };
+
+        const removeSlot = async (id) => {
+          state.slots = state.slots.filter(s => s.id !== id);
+          await savePublicConfig(false);
+          showToast('已移除該時段');
+        };
+
+        const updateBookingPayment = async (b) => {
+          if (supabaseClient && cloudConnected.value) {
+            await supabaseClient.rpc('admin_update_payment_v2', {
+              p_token: adminSessionToken.value,
+              p_booking_id: b.id,
+              p_status: b.paymentStatus
+            });
+          }
+          showToast('已更新收款狀態');
+        };
+
+        const deleteBooking = async (b) => {
+          const slot = state.slots.find(s => s.id === b.slotId);
+          if (slot) slot.isBooked = false;
+          state.bookings = state.bookings.filter(item => item.id !== b.id);
+          if (supabaseClient && cloudConnected.value) {
+            await supabaseClient.rpc('admin_delete_booking_v2', {
+              p_token: adminSessionToken.value,
+              p_booking_id: b.id
+            });
+            await savePublicConfig(false);
+          }
+          showToast('已刪除訂單並釋出時段');
+        };
+
+        const addCourse = async () => {
+          state.courses.unshift({ id: 'c_' + Date.now(), category: '精選課程', name: '新芳療課程', duration: 60, price: 1800, notes: '請輸入課程注意事項...' });
+          await savePublicConfig(false);
+        };
+
+        const removeCourse = async (id) => {
+          state.courses = state.courses.filter(c => c.id !== id);
+          await savePublicConfig(false);
+        };
+
+        const changePassword = async () => {
+          if (!pwdForm.oldPwd) return showToast('請輸入目前舊密碼', 'error');
+          if (pwdForm.newPwd.length < 6) return showToast('新密碼長度需至少 6 碼', 'error');
+          if (pwdForm.newPwd !== pwdForm.confirmPwd) return showToast('兩次輸入的密碼不一致', 'error');
+          if (supabaseClient && cloudConnected.value) {
+            const { data } = await supabaseClient.rpc('admin_change_password_v2', {
+              p_token: adminSessionToken.value,
+              p_old_pass: pwdForm.oldPwd.trim(),
+              p_new_pass: pwdForm.newPwd.trim()
+            });
+            if (!data) return showToast('舊密碼錯誤或更新失敗', 'error');
+          } else {
+            const oldHash = await sha256(pwdForm.oldPwd.trim());
+            const admin = state.localAdmins.find(a => a.username === currentAdminUser.value && a.passwordHash === oldHash);
+            if (!admin) return showToast('舊密碼錯誤', 'error');
+            admin.passwordHash = await sha256(pwdForm.newPwd.trim());
+          }
+          pwdForm.oldPwd = '';
+          pwdForm.newPwd = '';
+          pwdForm.confirmPwd = '';
+          showToast('高強度加鹽密碼已更新');
+        };
+
+        const addAdminUser = async () => {
+          if (newAdmin.username.length < 3 || newAdmin.password.length < 6) return showToast('帳號需至少 3 碼、密碼需至少 6 碼', 'error');
+          if (supabaseClient && cloudConnected.value) {
+            const { data } = await supabaseClient.rpc('admin_add_user_v2', {
+              p_token: adminSessionToken.value,
+              p_new_user: newAdmin.username.trim(),
+              p_new_pass: newAdmin.password.trim()
+            });
+            if (!data) return showToast('新增失敗或帳號已存在', 'error');
+            await refreshAdminData(false);
+          } else {
+            if (state.localAdmins.some(a => a.username === newAdmin.username.trim())) return showToast('此帳號已存在', 'error');
+            const hash = await sha256(newAdmin.password.trim());
+            state.localAdmins.push({ username: newAdmin.username.trim(), passwordHash: hash });
+          }
+          newAdmin.username = '';
+          newAdmin.password = '';
+          showToast('已新增管理員帳號');
+        };
+
+        const removeAdmin = async (username) => {
+          if (supabaseClient && cloudConnected.value) {
+            await supabaseClient.rpc('admin_remove_user_v2', {
+              p_token: adminSessionToken.value,
+              p_target_user: username
+            });
+            await refreshAdminData(false);
+          } else {
+            state.localAdmins = state.localAdmins.filter(a => a.username !== username);
+          }
+          showToast('已移除管理員');
+        };
+
+        const exportBackup = () => {
+          const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `willa-beauty-life-v2-backup-${new Date().toISOString().slice(0, 10)}.json`;
+          a.click();
+          URL.revokeObjectURL(url);
+          showToast('備份檔案已下載');
+        };
+
+        const importBackup = (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = async (ev) => {
+            try {
+              const imported = JSON.parse(ev.target.result);
+              if (imported.courses) {
+                Object.assign(state, imported);
+                if (window.applyDynamicBrandIcons) window.applyDynamicBrandIcons(state.customLogo || null);
+                await savePublicConfig(false);
+                showToast('資料還原成功！');
+              } else {
+                showToast('備份檔案格式不符', 'error');
+              }
+            } catch (err) {
+              showToast('讀取檔案失敗', 'error');
+            }
+          };
+          reader.readAsText(file);
+        };
+
+        onMounted(() => { initApp(); });
+
+        return {
+          view, adminTab, loadingCloud, submitting, lookingUp, loggingIn, showLoginPwd, cloudConnected, isAdminLoggedIn, currentAdminUser,
+          lockCountdown, toast, state, form, lookupForm, lookupSearched, loginForm, pwdForm, newAdmin,
+          calYear, calMonth, selectedDate, calendarCells, changeMonth, selectCalendarDate, slotsForSelectedDate,
+          categories, selectedCategory, currentCategoryEn, filteredCourses, selectedSlotObj, selectedCourseObj, estimatedEndTime,
+          scrollToGuestForm, batchSlot, presetTimes, toggleWeekday, togglePresetTime, addCustomPresetTime, addBatchSlots,
+          sortedSlots, sortedBookings, bookingFilters, bookingFilter, filteredAdminBookings, myBookings, adminList,
+          currentMonthLabel, monthlyConfirmedRevenue, totalConfirmedRevenue,
+          paymentLabel, copyText, copyBookingReceipt, handleLogoUpload, resetDefaultLogo,
+          submitBooking, handleLookup, handleAdminLogin, logoutAdmin,
+          removeSlot, updateBookingPayment, deleteBooking, addCourse, removeCourse,
+          changePassword, addAdminUser, removeAdmin, exportBackup, importBackup,
+          syncPublicData, savePublicConfig, refreshAdminData
+        };
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>
