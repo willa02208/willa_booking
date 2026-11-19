@@ -200,7 +200,7 @@
       </div>
     </transition>
 
-    <!-- 頂部高訂導覽列（針對手機與桌面精準適配） -->
+    <!-- 頂部高訂導覽列 -->
     <header class="shrink-0 px-3.5 sm:px-8 py-3 safe-top bg-[#FCFBF9]/95 backdrop-blur-md border-b border-[#E5D9CE] flex items-center justify-between gap-2 z-20">
       <div class="flex items-center gap-2.5 min-w-0 flex-1">
         <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full p-[1.5px] liquid-gold-ring shadow-sm shrink-0">
@@ -234,7 +234,6 @@
         </div>
       </div>
 
-      <!-- 精緻輕巧的單行膠囊選單 -->
       <nav class="shrink-0 flex items-center gap-0.5 sm:gap-1 bg-[#EFE9E1] p-0.5 sm:p-1 rounded-full border border-[#E2D5C8]">
         <button @click="view = 'book'" class="whitespace-nowrap px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-semibold tracking-wide transition" :class="view === 'book' ? 'bg-[#231D1B] text-[#FAF6F0] shadow-sm' : 'text-[#665A54] hover:text-[#231D1B]'">預約</button>
         <button @click="view = 'lookup'" class="whitespace-nowrap px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-semibold tracking-wide transition" :class="view === 'lookup' ? 'bg-[#231D1B] text-[#FAF6F0] shadow-sm' : 'text-[#665A54] hover:text-[#231D1B]'">查詢</button>
@@ -290,7 +289,7 @@
             </div>
           </div>
 
-          <!-- 01. 互動式月曆預約 -->
+          <!-- 01. 智慧防撞互動月曆 -->
           <div class="sanctuary-card rounded-3xl p-5 sm:p-6 space-y-4">
             <div class="flex items-center justify-between">
               <div>
@@ -339,7 +338,7 @@
                   <span class="text-[#8F5F50] font-medium">● 圓點代表可預約</span>
                 </div>
                 <div v-if="slotsForSelectedDate.length === 0" class="py-4 px-3 rounded-2xl bg-[#F6F2EC] text-center text-xs text-[#7A6D66] leading-relaxed">
-                  此日期暫無開放空檔，請點選帶有「圓點」的日期，或私訊 IG <a href="https://www.instagram.com/willa02208/" target="_blank" class="underline text-[#8F5F50] font-semibold">@willa02208</a> 詢問。
+                  此日期無符合所選課程時長的空檔，請選擇其他有「圓點」的日期，或私訊 IG <a href="https://www.instagram.com/willa02208/" target="_blank" class="underline text-[#8F5F50] font-semibold">@willa02208</a> 詢問。
                 </div>
                 <div v-else class="grid grid-cols-3 gap-2">
                   <button v-for="slot in slotsForSelectedDate" :key="slot.id" type="button" @click="form.slotId = slot.id"
@@ -353,14 +352,14 @@
           </div>
         </div>
 
-        <!-- 右欄：課程選擇 + 服務地點 + 貴賓表單 -->
+        <!-- 右欄：課程多選 + 服務地點 + 多筆預約籃與貴賓表單 -->
         <div class="lg:col-span-7 space-y-6">
-          <!-- 02. 專屬護理課程選擇 -->
+          <!-- 02. 專屬護理課程選擇（支援單次複選多課程） -->
           <div class="sanctuary-card rounded-3xl p-5 sm:p-6 space-y-4">
             <div class="flex items-end justify-between border-b border-[#EFE6DC] pb-3">
               <div>
                 <span class="text-[10px] tracking-[0.22em] text-[#9E6E5D] font-bold uppercase">Step 02 ・ Treatments</span>
-                <h2 class="text-base font-bold font-serif-tc text-[#231D1B]">選擇專屬護理課程</h2>
+                <h2 class="text-base font-bold font-serif-tc text-[#231D1B]">選擇專屬護理課程 <span class="text-xs font-normal text-[#8F5F50]">（可複選多項）</span></h2>
               </div>
               <span class="font-en-serif italic text-xs text-[#8F5F50]">{{ currentCategoryEn }}</span>
             </div>
@@ -374,14 +373,20 @@
             </div>
 
             <div class="space-y-2.5">
-              <div v-for="c in filteredCourses" :key="c.id" @click="form.courseId = c.id"
+              <div v-for="c in filteredCourses" :key="c.id" @click="toggleCourseSelection(c.id)"
                 class="p-4 rounded-2xl border transition cursor-pointer"
-                :class="form.courseId === c.id ? 'bg-[#FAF4EE] border-[#B3816E] ring-1 ring-[#B3816E] shadow-sm' : 'bg-white border-[#EAE0D6] hover:border-[#D4BFA9]'">
+                :class="form.courseIds.includes(c.id) ? 'bg-[#FAF4EE] border-[#B3816E] ring-1 ring-[#B3816E] shadow-sm' : 'bg-white border-[#EAE0D6] hover:border-[#D4BFA9]'">
                 <div class="flex justify-between items-start gap-3">
-                  <div class="space-y-1">
-                    <span class="text-[10px] tracking-wider px-2.5 py-0.5 rounded-full champagne-tag font-semibold">{{ c.category }}</span>
+                  <div class="space-y-1 flex-1">
+                    <div class="flex items-center gap-2">
+                      <span class="w-4 h-4 rounded-md border flex items-center justify-center text-[11px] font-bold shrink-0"
+                        :class="form.courseIds.includes(c.id) ? 'bg-[#231D1B] text-[#FAF6F0] border-[#231D1B]' : 'border-[#C8B9AC] bg-white'">
+                        {{ form.courseIds.includes(c.id) ? '✓' : '' }}
+                      </span>
+                      <span class="text-[10px] tracking-wider px-2.5 py-0.5 rounded-full champagne-tag font-semibold">{{ c.category }}</span>
+                    </div>
                     <h3 class="font-bold text-[#231D1B] text-[15px] leading-snug pt-0.5">{{ c.name }}</h3>
-                    <div v-if="c.duration > 0" class="text-xs text-[#7A6D66]">⏱ 課程時間 {{ c.duration }} 分鐘</div>
+                    <div v-if="c.duration > 0" class="text-xs text-[#7A6D66] price-num">⏱ 課程時間 {{ c.duration }} 分鐘</div>
                   </div>
                   <div class="text-right shrink-0 pt-0.5">
                     <div class="text-[17px] font-bold gold-text-gradient price-num tracking-tight">
@@ -428,13 +433,40 @@
               <label class="block text-xs font-bold text-[#5E524C]">請填寫完整到府服務地址 *</label>
               <input v-model.trim="form.address" type="text" maxlength="120" placeholder="例如：台中市北屯區..." class="w-full px-4 py-3 rounded-2xl border border-[#D8C7B8] bg-white focus:outline-none focus:border-[#B3816E]" />
             </div>
+
+            <!-- 目前組合確認與「加入多時段預約籃」按鈕 -->
+            <div v-if="selectedSlotObj && selectedCoursesList.length > 0" class="p-4 rounded-2xl bg-[#FAF4EE] border border-[#DFCBB9] space-y-3">
+              <div class="text-xs space-y-1 text-[#231D1B]">
+                <div class="font-bold text-[#8F5F50]">✦ 當前選擇時段與課程組合：</div>
+                <div class="price-num">時間：<span class="font-bold">{{ selectedSlotObj.date }} {{ selectedSlotObj.time }} – {{ estimatedEndTime }}</span>（共 {{ totalSelectedDuration }} 分鐘）</div>
+                <div class="price-num">項目：<span class="font-bold">{{ selectedCoursesSummaryName }}</span>（合計 {{ totalSelectedPrice === 0 ? 'Free' : '$' + totalSelectedPrice.toLocaleString() }}）</div>
+              </div>
+              <button type="button" @click="addCurrentToBookingCart" class="w-full py-2.5 rounded-xl bg-white border border-[#B3816E] text-xs font-bold text-[#8F5F50] hover:bg-[#F7ECE4] transition">
+                ＋ 加入預約清單（同位貴賓可繼續選其他日期時段）
+              </button>
+            </div>
           </div>
 
-          <!-- 04. 貴賓資訊與訂金後 4 碼 -->
-          <form id="guest-form" @submit.prevent="submitBooking" class="sanctuary-card rounded-3xl p-5 sm:p-6 space-y-4">
+          <!-- 04. 貴賓資訊與多筆預約籃送出 -->
+          <form id="guest-form" @submit.prevent="submitAllBookings" class="sanctuary-card rounded-3xl p-5 sm:p-6 space-y-4">
             <div>
               <span class="text-[10px] tracking-[0.22em] text-[#9E6E5D] font-bold uppercase">Step 04 ・ Guest Details</span>
               <h2 class="text-base font-bold font-serif-tc text-[#231D1B]">貴賓資訊與訂金確認</h2>
+            </div>
+
+            <!-- 已加入的多筆預約清單 -->
+            <div v-if="bookingCart.length > 0" class="p-4 rounded-2xl bg-[#231D1B] text-[#FAF6F0] space-y-2.5 border border-[#D4A68E]/60">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-[#E5C4AE]">🗂️ 待送出預約清單（共 {{ bookingCart.length }} 筆）</span>
+                <span class="text-xs font-bold text-[#E5C4AE] price-num">總計 NT$ {{ cartGrandTotal.toLocaleString() }}</span>
+              </div>
+              <div v-for="(item, idx) in bookingCart" :key="item.slotId" class="p-2.5 rounded-xl bg-[#302826] flex items-center justify-between gap-2 text-xs">
+                <div class="min-w-0">
+                  <div class="font-bold price-num">{{ idx + 1 }}. {{ item.date }} {{ item.time }} – {{ item.endTime }}</div>
+                  <div class="text-[#D6CEC8] truncate price-num">{{ item.courseName }}（{{ item.price === 0 ? 'Free' : '$' + item.price.toLocaleString() }}）</div>
+                </div>
+                <button type="button" @click="removeFromCart(idx)" class="text-[11px] px-2.5 py-1 rounded-lg bg-[#593535] text-white shrink-0">移除</button>
+              </div>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -467,29 +499,19 @@
               </div>
             </div>
 
-            <div v-if="selectedSlotObj && selectedCourseObj" class="p-4 rounded-2xl bg-[#231D1B] text-[#FAF6F0] text-xs space-y-1.5 border border-[#D4A68E]/60 shadow-inner">
-              <div class="text-[#E5C4AE] font-bold tracking-wider">✦ 本次預約明細核對：</div>
-              <div class="price-num">
-                預約時段：<span class="font-bold">{{ selectedSlotObj.date }} {{ selectedSlotObj.time }}</span>
-                <span v-if="estimatedEndTime" class="text-[#E5C4AE]"> – {{ estimatedEndTime }}（預計 {{ selectedCourseObj.duration }} 分鐘）</span>
-              </div>
-              <div class="price-num">護理課程：<span class="font-bold">{{ selectedCourseObj.name }}</span>（{{ Number(selectedCourseObj.price) === 0 ? 'Free' : '$' + Number(selectedCourseObj.price).toLocaleString() }}）</div>
-              <div>服務地點：<span class="font-bold">{{ form.locationType === 'studio' ? '私人工作室（遼陽四街39號3樓）' : '到府服務' }}</span></div>
-            </div>
-
             <button type="submit" :disabled="submitting" class="w-full py-4 rounded-2xl liquid-gold-btn font-bold tracking-[0.2em] text-base disabled:opacity-50">
-              {{ submitting ? '加密傳輸預約中...' : '確認送出預約' }}
+              {{ submitting ? '加密傳輸預約中...' : `確認送出預約（共 ${pendingSubmissionCount} 筆）` }}
             </button>
           </form>
         </div>
       </section>
 
-      <!-- ==================== 前台 2：客戶查詢預約 ==================== -->
+      <!-- ==================== 前台 2：客戶查詢預約（顯示同貴賓所有多筆預約） ==================== -->
       <section v-if="view === 'lookup'" class="max-w-xl mx-auto space-y-6 animate-fade-up">
         <div class="p-6 rounded-3xl bg-[#231D1B] text-[#FAF6F0] space-y-2 shadow-lg border border-[#D4A68E]/50">
           <div class="text-[11px] tracking-[0.22em] text-[#E5C4AE] uppercase">Private Inquiry</div>
           <h2 class="text-lg font-bold font-serif-tc tracking-wider">自助預約進度查詢</h2>
-          <p class="text-xs text-[#D6CEC8] leading-relaxed">輸入預約時填寫的「預約人姓名」與「連絡電話」，系統將透過隱私安全通道核對並顯示您的專屬預約。</p>
+          <p class="text-xs text-[#D6CEC8] leading-relaxed">輸入預約時填寫的「預約人姓名」與「連絡電話」，系統將顯示您名下的所有預約場次與訂金核對狀態。</p>
         </div>
 
         <form @submit.prevent="handleLookup" class="sanctuary-card rounded-3xl p-5 sm:p-6 space-y-3.5">
@@ -511,35 +533,41 @@
             <p class="text-sm font-bold text-[#231D1B]">查無相符的預約紀錄</p>
             <p class="text-xs text-[#7A6D66]">請確認姓名與電話是否與預約時完全一致</p>
           </div>
-          <div v-for="b in myBookings" :key="b.id" class="sanctuary-card p-5 rounded-3xl space-y-3.5">
-            <div class="flex justify-between items-center border-b border-[#EAE0D6] pb-3">
-              <div>
-                <div class="text-[11px] text-[#7A6D66]">預約日期與時間</div>
-                <div class="text-base font-bold text-[#231D1B] price-num">{{ b.date }} {{ b.time }}</div>
+          <template v-else>
+            <div class="flex items-center justify-between px-1">
+              <span class="text-xs font-bold text-[#231D1B]">共找到 {{ myBookings.length }} 筆預約紀錄</span>
+              <button type="button" @click="copyAllLookupReceipts" class="text-xs px-3 py-1 rounded-full champagne-tag font-semibold">📋 一鍵複製全部明細</button>
+            </div>
+            <div v-for="b in myBookings" :key="b.id" class="sanctuary-card p-5 rounded-3xl space-y-3.5">
+              <div class="flex justify-between items-center border-b border-[#EAE0D6] pb-3">
+                <div>
+                  <div class="text-[11px] text-[#7A6D66]">預約日期與時間</div>
+                  <div class="text-base font-bold text-[#231D1B] price-num">{{ b.date }} {{ b.time }} <span v-if="b.endTime" class="text-xs font-normal text-[#7A6D66]">– {{ b.endTime }}</span></div>
+                </div>
+                <span class="px-3 py-1 rounded-full text-xs font-semibold" :class="b.paymentStatus === 'paid' ? 'bg-[#EDF3EF] text-[#2E5E42]' : b.paymentStatus === 'deposit' ? 'bg-[#EBF1F6] text-[#2C557A]' : 'champagne-tag'">
+                  {{ paymentLabel(b.paymentStatus) }}
+                </span>
               </div>
-              <span class="px-3 py-1 rounded-full text-xs font-semibold" :class="b.paymentStatus === 'paid' ? 'bg-[#EDF3EF] text-[#2E5E42]' : b.paymentStatus === 'deposit' ? 'bg-[#EBF1F6] text-[#2C557A]' : 'champagne-tag'">
-                {{ paymentLabel(b.paymentStatus) }}
-              </span>
-            </div>
-            <div class="text-sm space-y-1.5 text-[#4A403B]">
-              <div class="price-num"><span class="text-[#7A6D66]">預約課程：</span><span class="font-bold">{{ b.courseName }}</span>（{{ Number(b.price) === 0 ? 'Free' : '$' + Number(b.price).toLocaleString() }}）</div>
-              <div><span class="text-[#7A6D66]">服務地點：</span>{{ b.locationType === 'studio' ? '工作室（台中市北屯區遼陽四街39號3樓）' : '到府（' + b.address + '）' }}</div>
-              <div class="price-num"><span class="text-[#7A6D66]">訂金後 4 碼：</span>{{ b.depositLast4 }}</div>
-              <div v-if="b.customerNote"><span class="text-[#7A6D66]">備註事項：</span>{{ b.customerNote }}</div>
+              <div class="text-sm space-y-1.5 text-[#4A403B]">
+                <div class="price-num"><span class="text-[#7A6D66]">預約課程：</span><span class="font-bold">{{ b.courseName }}</span>（{{ Number(b.price) === 0 ? 'Free' : '$' + Number(b.price).toLocaleString() }}）</div>
+                <div><span class="text-[#7A6D66]">服務地點：</span>{{ b.locationType === 'studio' ? '工作室（台中市北屯區遼陽四街39號3樓）' : '到府（' + b.address + '）' }}</div>
+                <div class="price-num"><span class="text-[#7A6D66]">訂金後 4 碼：</span>{{ b.depositLast4 }}</div>
+                <div v-if="b.customerNote"><span class="text-[#7A6D66]">備註事項：</span>{{ b.customerNote }}</div>
+              </div>
+
+              <button type="button" @click="copyBookingReceipt(b)" class="w-full py-2.5 rounded-xl bg-[#EFE9E1] border border-[#DFCBB9] text-xs font-bold text-[#231D1B] hover:border-[#B3816E] transition">
+                📋 複製此筆預約明細（傳送 LINE / IG 確認）
+              </button>
             </div>
 
-            <button type="button" @click="copyBookingReceipt(b)" class="w-full py-2.5 rounded-xl bg-[#EFE9E1] border border-[#DFCBB9] text-xs font-bold text-[#231D1B] hover:border-[#B3816E] transition">
-              📋 一鍵複製預約明細（方便傳送 LINE / IG 確認）
-            </button>
-
-            <div class="p-3.5 rounded-2xl bg-[#F6F2EC] border border-[#E2D4C6] text-xs text-[#5E524C] leading-relaxed space-y-2">
+            <div class="p-4 rounded-2xl bg-[#F6F2EC] border border-[#E2D4C6] text-xs text-[#5E524C] leading-relaxed space-y-2">
               <div>⚠️ <span class="font-bold text-[#231D1B]">異動與取消說明：</span>為維護每位貴賓的專屬時段，線上系統不開放直接取消。如需更改時間或取消預約，請直接<span class="font-bold text-[#8F5F50]">致電工作室</span>、私訊 IG 或透過官方 LINE 由專人為您協助。</div>
               <div class="flex gap-2">
                 <a href="https://www.instagram.com/willa02208/" target="_blank" class="px-3 py-1.5 rounded-xl bg-white border border-[#D8C7B8] text-[11px] font-bold text-[#231D1B]">私訊 IG @willa02208 ↗</a>
                 <a href="https://lin.ee/3o6UCFv" target="_blank" class="px-3 py-1.5 rounded-xl liquid-gold-btn text-[11px] font-bold">聯繫官方 LINE ↗</a>
               </div>
             </div>
-          </div>
+          </template>
         </div>
       </section>
 
@@ -592,8 +620,8 @@
 
           <div class="flex gap-1.5 overflow-x-auto pb-1">
             <button @click="adminTab = 'bookings'" class="px-3.5 py-2 rounded-xl text-xs font-semibold shrink-0" :class="adminTab === 'bookings' ? 'bg-[#231D1B] text-white' : 'bg-[#EFE9E1] text-[#5E524C]'">📋 預約與營收 ({{ sortedBookings.length }})</button>
-            <button @click="adminTab = 'slots'" class="px-3.5 py-2 rounded-xl text-xs font-semibold shrink-0" :class="adminTab === 'slots' ? 'bg-[#231D1B] text-white' : 'bg-[#EFE9E1] text-[#5E524C]'">🗓️ 排班開放時段</button>
-            <button @click="adminTab = 'courses'" class="px-3.5 py-2 rounded-xl text-xs font-semibold shrink-0" :class="adminTab === 'courses' ? 'bg-[#231D1B] text-white' : 'bg-[#EFE9E1] text-[#5E524C]'">💆 課程與注意事項</button>
+            <button @click="adminTab = 'slots'" class="px-3.5 py-2 rounded-xl text-xs font-semibold shrink-0" :class="adminTab === 'slots' ? 'bg-[#231D1B] text-white' : 'bg-[#EFE9E1] text-[#5E524C]'">🗓️ 排班與緩衝設定</button>
+            <button @click="adminTab = 'courses'" class="px-3.5 py-2 rounded-xl text-xs font-semibold shrink-0" :class="adminTab === 'courses' ? 'bg-[#231D1B] text-white' : 'bg-[#EFE9E1] text-[#5E524C]'">💆 課程與時長</button>
             <button @click="adminTab = 'security'" class="px-3.5 py-2 rounded-xl text-xs font-semibold shrink-0" :class="adminTab === 'security' ? 'bg-[#231D1B] text-white' : 'bg-[#EFE9E1] text-[#5E524C]'">🔐 品牌・帳務・資安</button>
           </div>
 
@@ -622,7 +650,9 @@
             <div v-for="b in filteredAdminBookings" :key="b.id" class="sanctuary-card p-4 rounded-2xl space-y-3">
               <div class="flex justify-between items-start">
                 <div>
-                  <span class="inline-block px-2.5 py-0.5 rounded-lg bg-[#231D1B] text-[#FAF6F0] text-xs font-semibold price-num">{{ b.date }} {{ b.time }}</span>
+                  <span class="inline-block px-2.5 py-0.5 rounded-lg bg-[#231D1B] text-[#FAF6F0] text-xs font-semibold price-num">
+                    {{ b.date }} {{ b.time }} <span v-if="b.endTime">– {{ b.endTime }}</span>
+                  </span>
                   <h3 class="font-bold text-base text-[#231D1B] mt-1.5 flex items-center gap-2">
                     <span>{{ b.customerName }}</span>
                     <a :href="'tel:' + b.phone" class="text-xs font-semibold px-2 py-0.5 rounded-md champagne-tag price-num">📞 {{ b.phone }}</a>
@@ -634,7 +664,7 @@
                 </div>
               </div>
               <div class="text-xs text-[#4A403B] space-y-1 bg-[#F6F2EC] p-3 rounded-xl">
-                <div><span class="font-bold">課程：</span>{{ b.courseName }}</div>
+                <div><span class="font-bold">課程：</span>{{ b.courseName }} <span v-if="b.duration">（共 {{ b.duration }} 分鐘）</span></div>
                 <div><span class="font-bold">地點：</span>{{ b.locationType === 'studio' ? '工作室（遼陽四街39號3樓）' : '到府：' + b.address }}</div>
                 <div v-if="b.customerNote"><span class="font-bold">客戶備註：</span>{{ b.customerNote }}</div>
               </div>
@@ -652,8 +682,27 @@
             </div>
           </div>
 
-          <!-- Tab 2: 跨日批次排班開放時段 -->
+          <!-- Tab 2: 跨日批次排班與整理緩衝時間設定 -->
           <div v-if="adminTab === 'slots'" class="space-y-4">
+            <!-- 課後整理緩衝時間設定 -->
+            <div class="sanctuary-card p-4 rounded-2xl space-y-2.5">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-xs font-bold text-[#231D1B]">⏳ 每堂課後整理／轉場緩衝時間（自動扣除重疊時段）</h3>
+                  <p class="text-[11px] text-[#7A6D66] mt-0.5">例如：11:00 預約 80 分鐘課程（至 12:20），若設 45 分鐘緩衝，則 13:00 也會自動鎖定不接單</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <select v-model.number="state.bufferMinutes" @change="savePublicConfig(true)" class="flex-1 px-3 py-2.5 rounded-xl border border-[#D8C7B8] bg-white text-xs font-bold">
+                  <option :value="0">0 分鐘（僅扣除課程本身佔用時間）</option>
+                  <option :value="15">15 分鐘整理緩衝</option>
+                  <option :value="30">30 分鐘整理緩衝</option>
+                  <option :value="45">45 分鐘整理緩衝（80分課程會連帶鎖住下下個整點）</option>
+                  <option :value="60">60 分鐘整理／車程緩衝</option>
+                </select>
+              </div>
+            </div>
+
             <form @submit.prevent="addBatchSlots" class="sanctuary-card p-4 rounded-2xl space-y-3.5">
               <h3 class="text-xs font-bold text-[#231D1B]">🗓️ 單日／跨日批次開放預約時段</h3>
               <div class="grid grid-cols-2 gap-2.5">
@@ -699,8 +748,9 @@
               <div v-for="s in sortedSlots" :key="s.id" class="sanctuary-card flex items-center justify-between p-3.5 rounded-2xl">
                 <div>
                   <span class="font-bold text-sm text-[#231D1B] price-num">{{ s.date }} {{ s.time }}</span>
-                  <span class="ml-2 text-xs px-2.5 py-0.5 rounded-full font-medium" :class="s.isBooked ? 'bg-[#EAE0D6] text-[#665A54]' : 'bg-[#EDF3EF] text-[#2E5E42]'">
-                    {{ s.isBooked ? '已被預約' : '開放中' }}
+                  <span class="ml-2 text-xs px-2.5 py-0.5 rounded-full font-medium"
+                    :class="s.isBooked ? 'bg-[#EAE0D6] text-[#665A54]' : isSlotBlockedByBooking(s) ? 'bg-[#FBF0E6] text-[#9E5E38]' : 'bg-[#EDF3EF] text-[#2E5E42]'">
+                    {{ s.isBooked ? '已直接預約' : isSlotBlockedByBooking(s) ? '時長重疊已扣除' : '開放中' }}
                   </span>
                 </div>
                 <button @click="removeSlot(s.id)" class="text-xs text-[#7A2E2E] px-2.5 py-1 rounded-lg bg-[#F8EBEB]">移除</button>
@@ -708,7 +758,7 @@
             </div>
           </div>
 
-          <!-- Tab 3: 課程項目與注意事項編輯 -->
+          <!-- Tab 3: 課程項目、時長與注意事項編輯 -->
           <div v-if="adminTab === 'courses'" class="space-y-4">
             <div class="flex gap-2">
               <button @click="addCourse" class="flex-1 py-3 rounded-2xl border-2 border-dashed border-[#C7B3A3] text-xs font-bold text-[#5E524C] hover:border-[#231D1B]">+ 新增課程項目</button>
@@ -729,7 +779,7 @@
                   <input v-model.number="c.price" type="number" class="w-full px-3 py-2 rounded-xl border border-[#D8C7B8] text-sm bg-white" />
                 </div>
                 <div>
-                  <label class="text-[11px] text-[#7A6D66]">時長 (分鐘，0 為不顯示)</label>
+                  <label class="text-[11px] text-[#7A6D66]">佔用時長 (分鐘，用於自動扣除檔期)</label>
                   <input v-model.number="c.duration" type="number" class="w-full px-3 py-2 rounded-xl border border-[#D8C7B8] text-sm bg-white" />
                 </div>
               </div>
@@ -811,13 +861,13 @@
     </main>
 
     <!-- 手機端懸浮底部流金確認條 -->
-    <div v-if="view === 'book' && (selectedSlotObj || selectedCourseObj)" class="lg:hidden fixed bottom-0 inset-x-0 z-30 px-4 py-3 bg-[#231D1B]/95 backdrop-blur-md text-[#FAF6F0] border-t border-[#D4A68E]/50 flex items-center justify-between gap-3">
+    <div v-if="view === 'book' && (selectedSlotObj || selectedCoursesList.length > 0 || bookingCart.length > 0)" class="lg:hidden fixed bottom-0 inset-x-0 z-30 px-4 py-3 bg-[#231D1B]/95 backdrop-blur-md text-[#FAF6F0] border-t border-[#D4A68E]/50 flex items-center justify-between gap-3">
       <div class="min-w-0">
         <div class="text-[11px] text-[#E5C4AE] truncate price-num">
-          {{ selectedSlotObj ? `${selectedSlotObj.date} ${selectedSlotObj.time}` : '尚未選擇時段' }}
+          {{ selectedSlotObj ? `${selectedSlotObj.date} ${selectedSlotObj.time}（${totalSelectedDuration}分）` : (bookingCart.length > 0 ? `已加入 ${bookingCart.length} 筆時段` : '尚未選擇時段') }}
         </div>
         <div class="text-xs font-bold truncate price-num">
-          {{ selectedCourseObj ? `${selectedCourseObj.name}・${Number(selectedCourseObj.price) === 0 ? 'Free' : '$' + Number(selectedCourseObj.price).toLocaleString()}` : '' }}
+          {{ selectedCoursesList.length > 0 ? `${selectedCoursesSummaryName}・$${totalSelectedPrice.toLocaleString()}` : '' }}
         </div>
       </div>
       <button type="button" @click="scrollToGuestForm" class="shrink-0 px-4 py-2 rounded-full liquid-gold-btn text-xs font-bold tracking-wider">
@@ -837,6 +887,18 @@
       const data = encoder.encode(text);
       const hashBuffer = await crypto.subtle.digest('SHA-256', data);
       return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    // 時間字串 (HH:MM) 與分鐘數轉換工具
+    function timeToMinutes(hhmm) {
+      const [h, m] = String(hhmm || '00:00').split(':').map(Number);
+      return (h || 0) * 60 + (m || 0);
+    }
+
+    function minutesToTime(totalMins) {
+      const h = Math.floor(totalMins / 60) % 24;
+      const m = totalMins % 60;
+      return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
     }
 
     createApp({
@@ -870,18 +932,19 @@
 
         let supabaseClient = null;
 
+        // 完整 13 項課程（含合理預設佔用分鐘數，供系統精準扣除衝突時段）
         const defaultCourses = [
-          { id: 'c1', category: '媽咪專屬', name: '孕婦舒壓按摩', duration: 0, price: 2200, notes: '呵護生命，也呵護妳。建議懷孕滿 12 週以上且產檢穩定之媽咪預約，請備註目前孕期週數。' },
-          { id: 'c2', category: '媽咪專屬', name: '產前泌乳衛教', duration: 0, price: 0, notes: '免費一對一產前泌乳觀念與準備指導，建議懷孕 32 週後預約。' },
-          { id: 'c3', category: '媽咪專屬', name: '產後開乳腺．塞奶疏通', duration: 0, price: 2500, notes: '溫和無痛手技疏通乳腺硬塊與脹奶不適，若有發燒或紅腫發炎請先就醫評估。' },
-          { id: 'c4', category: '媽咪專屬', name: '腹直肌（贈古法紮肚）', duration: 0, price: 2200, notes: '室長姿姿主打課程！從腹部狀態、核心使用感到日常習慣，陪妳找回舒服與支撐感（自然產滿2週、剖腹產滿4週且傷口癒合即可預約）。' },
-          { id: 'c5', category: '媽咪專屬', name: '退奶美胸', duration: 0, price: 1800, notes: '漸進式溫和排空與胸型緊緻護理，協助媽咪輕鬆度過離乳期。' },
+          { id: 'c1', category: '媽咪專屬', name: '孕婦舒壓按摩', duration: 60, price: 2200, notes: '呵護生命，也呵護妳。建議懷孕滿 12 週以上且產檢穩定之媽咪預約，請備註目前孕期週數。' },
+          { id: 'c2', category: '媽咪專屬', name: '產前泌乳衛教', duration: 40, price: 0, notes: '免費一對一產前泌乳觀念與準備指導，建議懷孕 32 週後預約。' },
+          { id: 'c3', category: '媽咪專屬', name: '產後開乳腺．塞奶疏通', duration: 60, price: 2500, notes: '溫和無痛手技疏通乳腺硬塊與脹奶不適，若有發燒或紅腫發炎請先就醫評估。' },
+          { id: 'c4', category: '媽咪專屬', name: '腹直肌（贈古法紮肚）', duration: 60, price: 2200, notes: '室長姿姿主打課程！從腹部狀態、核心使用感到日常習慣，陪妳找回舒服與支撐感（自然產滿2週、剖腹產滿4週且傷口癒合即可預約）。' },
+          { id: 'c5', category: '媽咪專屬', name: '退奶美胸', duration: 50, price: 1800, notes: '漸進式溫和排空與胸型緊緻護理，協助媽咪輕鬆度過離乳期。' },
           { id: 'c6', category: '美胸護理', name: '柔韻美胸', duration: 50, price: 1480, notes: '溫柔雕塑．自信綻放。疏通胸部周圍循環與淋巴，改善胸悶與副乳緊繃。' },
           { id: 'c7', category: '美胸護理', name: '甦活美胸', duration: 80, price: 2200, notes: '深度美胸雕塑與乳腺活絡調理，建議生理期結束後 3～7 天進行效果最佳。' },
           { id: 'c8', category: '溫感植草舒活 SPA 系列', name: '頭．前胸．腰臀．腹部', duration: 60, price: 1600, notes: '植草溫養．身心重新平衡。針對久坐循環不良與核心深層放鬆。' },
           { id: 'c9', category: '溫感植草舒活 SPA 系列', name: '頭．肩頸．全背．全手．前胸', duration: 60, price: 1800, notes: '上半身完整經絡釋壓，適合長期使用電腦、肩頸僵硬與睡眠品質不佳者。' },
           { id: 'c10', category: '溫感植草舒活 SPA 系列', name: '頭．肩頸．全背．全手．前胸．後腿', duration: 90, price: 2200, notes: '全身深層溫感植草芳療調理，從頭到腳徹底釋放累積疲勞。' },
-          { id: 'c11', category: '溫感植草舒活 SPA 系列', name: '植草舒活大全餐', duration: 0, price: 2999, notes: '頂級全方位身心靈深度修護套餐，建議預留充裕時間享受完整療程。' },
+          { id: 'c11', category: '溫感植草舒活 SPA 系列', name: '植草舒活大全餐', duration: 120, price: 2999, notes: '頂級全方位身心靈深度修護套餐，建議預留充裕時間享受完整療程。' },
           { id: 'c12', category: '溫感植草舒活 SPA 系列', name: '肩頸能量放鬆', duration: 15, price: 399, notes: '快速局部舒緩緊繃肩頸，可單獨體驗或搭配其他課程加購。' },
           { id: 'c13', category: '溫感植草舒活 SPA 系列', name: '後腿舒緩', duration: 20, price: 599, notes: '針對久站、運動後或下肢水腫進行深層肌筋膜放鬆。' }
         ];
@@ -894,36 +957,42 @@
           return `${formatDate(d)} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
         };
         const tomorrowObj = new Date(todayObj.getTime() + 86400000);
-        const dayAfterObj = new Date(todayObj.getTime() + 86400000 * 2);
 
         const defaultState = {
           courses: defaultCourses,
           slots: [
-            { id: 's1', date: formatDate(tomorrowObj), time: '11:00', isBooked: false },
-            { id: 's2', date: formatDate(tomorrowObj), time: '14:30', isBooked: false },
-            { id: 's3', date: formatDate(dayAfterObj), time: '13:00', isBooked: false },
-            { id: 's4', date: formatDate(dayAfterObj), time: '18:30', isBooked: false }
+            { id: 's1', date: formatDate(tomorrowObj), time: '10:00', isBooked: false },
+            { id: 's2', date: formatDate(tomorrowObj), time: '11:00', isBooked: false },
+            { id: 's3', date: formatDate(tomorrowObj), time: '12:00', isBooked: false },
+            { id: 's4', date: formatDate(tomorrowObj), time: '13:00', isBooked: false },
+            { id: 's5', date: formatDate(tomorrowObj), time: '14:00', isBooked: false },
+            { id: 's6', date: formatDate(tomorrowObj), time: '15:00', isBooked: false }
           ],
+          // 公開已佔用時間區間表（供前端計算時長衝突，不含客戶任何隱私個資）
+          busyIntervals: [],
           bookings: [],
           localAdmins: [],
           bankInfo: '',
           bankAccount: '',
-          customLogo: ''
+          customLogo: '',
+          bufferMinutes: 30
         };
 
         const loadLocalState = () => {
           try {
-            const raw = localStorage.getItem('willa_spa_v2_final');
+            const raw = localStorage.getItem('willa_spa_v3_state');
             if (!raw) return JSON.parse(JSON.stringify(defaultState));
             const parsed = JSON.parse(raw);
             return {
               courses: Array.isArray(parsed.courses) && parsed.courses.length ? parsed.courses : defaultCourses,
               slots: Array.isArray(parsed.slots) ? parsed.slots : defaultState.slots,
+              busyIntervals: Array.isArray(parsed.busyIntervals) ? parsed.busyIntervals : [],
               bookings: Array.isArray(parsed.bookings) ? parsed.bookings : [],
               localAdmins: Array.isArray(parsed.localAdmins) ? parsed.localAdmins : [],
               bankInfo: parsed.bankInfo || '',
               bankAccount: parsed.bankAccount || '',
-              customLogo: parsed.customLogo || ''
+              customLogo: parsed.customLogo || '',
+              bufferMinutes: typeof parsed.bufferMinutes === 'number' ? parsed.bufferMinutes : 30
             };
           } catch (e) {
             return JSON.parse(JSON.stringify(defaultState));
@@ -943,10 +1012,103 @@
         const calMonth = ref(todayObj.getMonth());
         const selectedDate = ref(formatDate(tomorrowObj));
 
+        const form = reactive({
+          slotId: '',
+          courseIds: [state.courses[3]?.id || state.courses[0]?.id || ''],
+          locationType: 'studio',
+          address: '',
+          customerName: '',
+          phone: '',
+          customerNote: '',
+          depositLast4: ''
+        });
+
+        // 多時段預約籃（同位客人一次送出多筆預約）
+        const bookingCart = ref([]);
+
+        const toggleCourseSelection = (courseId) => {
+          const idx = form.courseIds.indexOf(courseId);
+          if (idx > -1) {
+            if (form.courseIds.length > 1) form.courseIds.splice(idx, 1);
+            else showToast('請至少保留一項預約課程', 'error');
+          } else {
+            form.courseIds.push(courseId);
+          }
+          // 若重新選課導致目前選中的時段不再足夠容納新總時長，自動清除重選
+          if (form.slotId && !futureAvailableSlots.value.some(s => s.id === form.slotId)) {
+            form.slotId = '';
+            showToast('課程總時長變更，請重新確認可用時段', 'error');
+          }
+        };
+
+        const selectedCoursesList = computed(() => {
+          return state.courses.filter(c => form.courseIds.includes(c.id));
+        });
+
+        const selectedCoursesSummaryName = computed(() => {
+          return selectedCoursesList.value.map(c => c.name).join(' ＋ ');
+        });
+
+        const totalSelectedPrice = computed(() => {
+          return selectedCoursesList.value.reduce((sum, c) => sum + (Number(c.price) || 0), 0);
+        });
+
+        const totalSelectedDuration = computed(() => {
+          return selectedCoursesList.value.reduce((sum, c) => sum + (Number(c.duration) || 60), 0);
+        });
+
+        const selectedSlotObj = computed(() => state.slots.find(s => s.id === form.slotId));
+
+        const estimatedEndTime = computed(() => {
+          if (!selectedSlotObj.value) return '';
+          return minutesToTime(timeToMinutes(selectedSlotObj.value.time) + totalSelectedDuration.value);
+        });
+
+        // 合併「雲端已成立訂單佔用區間」與「目前購物車暫存區間」
+        const allBlockedIntervals = computed(() => {
+          const list = Array.isArray(state.busyIntervals) ? [...state.busyIntervals] : [];
+          bookingCart.value.forEach(item => {
+            list.push({
+              bookingId: item.id,
+              date: item.date,
+              startMin: item.startMin,
+              endMin: item.endMin
+            });
+          });
+          return list;
+        });
+
+        // 檢查某個開放時段是否被既有的時間區間連帶佔用（供後台標籤顯示）
+        const isSlotBlockedByBooking = (slot) => {
+          if (slot.isBooked) return true;
+          const sStart = timeToMinutes(slot.time);
+          const sEnd = sStart + 30;
+          return allBlockedIntervals.value.some(b => b.date === slot.date && sStart < b.endMin && sEnd > b.startMin);
+        };
+
+        // 核心：根據「當前所選課程總時長 + 整理緩衝時間」與「既有佔用區間」過濾出真正可預約的時段
         const futureAvailableSlots = computed(() => {
           const threshold = nowDateTimeStr();
+          const buffer = Number(state.bufferMinutes) || 0;
+          const neededSpan = totalSelectedDuration.value + buffer;
+
           return state.slots
-            .filter(s => !s.isBooked && `${s.date} ${s.time}` > threshold)
+            .filter(s => {
+              if (s.isBooked) return false;
+              if (`${s.date} ${s.time}` <= threshold) return false;
+              if (bookingCart.value.some(c => c.slotId === s.id)) return false;
+
+              const candStart = timeToMinutes(s.time);
+              const candEnd = candStart + neededSpan;
+
+              // 雙向區間重疊檢查：newStart < existingEnd && newEnd > existingStart
+              const hasCollision = allBlockedIntervals.value.some(b => {
+                if (b.date !== s.date) return false;
+                return candStart < b.endMin && candEnd > b.startMin;
+              });
+
+              return !hasCollision;
+            })
             .sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`));
         });
 
@@ -1013,33 +1175,53 @@
           return state.courses.filter(c => (c.category || '精選課程') === selectedCategory.value);
         });
 
-        const form = reactive({
-          slotId: '',
-          courseId: state.courses[3]?.id || state.courses[0]?.id || '',
-          locationType: 'studio',
-          address: '',
-          customerName: '',
-          phone: '',
-          customerNote: '',
-          depositLast4: ''
-        });
-
-        const selectedSlotObj = computed(() => state.slots.find(s => s.id === form.slotId));
-        const selectedCourseObj = computed(() => state.courses.find(c => c.id === form.courseId));
-
-        const estimatedEndTime = computed(() => {
-          if (!selectedSlotObj.value || !selectedCourseObj.value || !selectedCourseObj.value.duration) return '';
-          const [hh, mm] = selectedSlotObj.value.time.split(':').map(Number);
-          const totalMins = hh * 60 + mm + Number(selectedCourseObj.value.duration);
-          const endH = Math.floor(totalMins / 60) % 24;
-          const endM = totalMins % 60;
-          return `${pad2(endH)}:${pad2(endM)}`;
-        });
-
         const scrollToGuestForm = () => {
           const el = document.getElementById('guest-form');
           if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
         };
+
+        // 將當前時段與課程加入多筆預約籃
+        const addCurrentToBookingCart = () => {
+          if (!selectedSlotObj.value || selectedCoursesList.value.length === 0) {
+            return showToast('請先選擇日期時段與課程', 'error');
+          }
+          if (form.locationType === 'home' && !form.address) {
+            return showToast('請先填寫到府服務地址', 'error');
+          }
+          const startMin = timeToMinutes(selectedSlotObj.value.time);
+          const buffer = Number(state.bufferMinutes) || 0;
+          bookingCart.value.push({
+            id: 'b_' + Date.now() + '_' + Math.random().toString(36).slice(2, 5),
+            slotId: selectedSlotObj.value.id,
+            date: selectedSlotObj.value.date,
+            time: selectedSlotObj.value.time,
+            endTime: minutesToTime(startMin + totalSelectedDuration.value),
+            startMin,
+            endMin: startMin + totalSelectedDuration.value + buffer,
+            courseName: selectedCoursesSummaryName.value,
+            duration: totalSelectedDuration.value,
+            price: totalSelectedPrice.value,
+            locationType: form.locationType,
+            address: form.locationType === 'home' ? form.address : '台中市北屯區遼陽四街39號3樓'
+          });
+          form.slotId = '';
+          showToast('已加入預約清單！您可繼續選擇其他時段或直接填寫資料送出');
+        };
+
+        const removeFromCart = (idx) => {
+          bookingCart.value.splice(idx, 1);
+          showToast('已從清單移除該時段');
+        };
+
+        const pendingSubmissionCount = computed(() => {
+          let count = bookingCart.value.length;
+          if (selectedSlotObj.value && selectedCoursesList.value.length > 0) count++;
+          return count;
+        });
+
+        const cartGrandTotal = computed(() => {
+          return bookingCart.value.reduce((sum, item) => sum + (Number(item.price) || 0), 0);
+        });
 
         const lookupForm = reactive({ name: '', phone: '' });
         const loginForm = reactive({ username: '', password: '' });
@@ -1047,10 +1229,10 @@
           startDate: formatDate(tomorrowObj),
           endDate: formatDate(tomorrowObj),
           weekdays: [0, 1, 2, 3, 4, 5, 6],
-          times: ['11:00', '14:30'],
+          times: ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00'],
           customTime: ''
         });
-        const presetTimes = ref(['10:00', '11:00', '13:00', '14:30', '16:00', '18:30', '20:00']);
+        const presetTimes = ref(['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:30', '18:30']);
         const pwdForm = reactive({ oldPwd: '', newPwd: '', confirmPwd: '' });
         const newAdmin = reactive({ username: '', password: '' });
 
@@ -1074,8 +1256,8 @@
 
         const myBookings = computed(() => {
           if (!lookupSearched.value) return [];
-          if (cloudConnected.value) return lookedUpResults.value;
-          return sortedBookings.value.filter(b => b.customerName === lookupForm.name && b.phone === lookupForm.phone);
+          const list = cloudConnected.value ? lookedUpResults.value : sortedBookings.value.filter(b => b.customerName === lookupForm.name && b.phone === lookupForm.phone);
+          return [...list].sort((a, b) => `${a.date} ${a.time}`.localeCompare(`${b.date} ${b.time}`));
         });
 
         const currentMonthPrefix = formatDate(new Date()).slice(0, 7);
@@ -1108,15 +1290,25 @@
           }
         };
 
-        const copyBookingReceipt = (b) => {
+        const formatSingleReceipt = (b) => {
           const locText = b.locationType === 'studio' ? '私人工作室（台中市北屯區遼陽四街39號3樓）' : `到府服務（${b.address}）`;
           const priceText = Number(b.price) === 0 ? 'Free' : `NT$ ${Number(b.price).toLocaleString()}`;
-          const receipt = `【Willa 生活美學｜預約確認明細】\n預約時間：${b.date} ${b.time}\n護理課程：${b.courseName}（${priceText}）\n服務地點：${locText}\n預約貴賓：${b.customerName}（${b.phone}）\n訂金後4碼：${b.depositLast4}\n狀態：${paymentLabel(b.paymentStatus)}`;
-          copyText(receipt, '已複製預約明細，可直接貼上給官方 LINE');
+          const timeRange = b.endTime ? `${b.time} – ${b.endTime}` : b.time;
+          return `預約時間：${b.date} ${timeRange}\n護理課程：${b.courseName}（${priceText}）\n服務地點：${locText}\n預約貴賓：${b.customerName}（${b.phone}）\n訂金後4碼：${b.depositLast4}\n狀態：${paymentLabel(b.paymentStatus)}`;
+        };
+
+        const copyBookingReceipt = (b) => {
+          copyText(`【Willa 生活美學｜預約確認明細】\n${formatSingleReceipt(b)}`, '已複製預約明細，可直接貼上給官方 LINE');
+        };
+
+        const copyAllLookupReceipts = () => {
+          if (myBookings.value.length === 0) return;
+          const allText = myBookings.value.map((b, i) => `【第 ${i + 1} 筆預約】\n${formatSingleReceipt(b)}`).join('\n\n');
+          copyText(`【Willa 生活美學｜全部預約總覽】\n\n${allText}`, `已複製全部 ${myBookings.value.length} 筆預約明細`);
         };
 
         watch(state, () => {
-          try { localStorage.setItem('willa_spa_v2_final', JSON.stringify(state)); } catch (e) {}
+          try { localStorage.setItem('willa_spa_v3_state', JSON.stringify(state)); } catch (e) {}
         }, { deep: true });
 
         const handleLogoUpload = (e) => {
@@ -1180,26 +1372,30 @@
             if (data && data.payload) {
               if (data.payload.courses) state.courses = data.payload.courses;
               if (data.payload.slots) state.slots = data.payload.slots;
+              if (Array.isArray(data.payload.busyIntervals)) state.busyIntervals = data.payload.busyIntervals;
               if (data.payload.bankInfo !== undefined) state.bankInfo = data.payload.bankInfo;
               if (data.payload.bankAccount !== undefined) state.bankAccount = data.payload.bankAccount;
+              if (typeof data.payload.bufferMinutes === 'number') state.bufferMinutes = data.payload.bufferMinutes;
               if (data.payload.customLogo !== undefined) {
                 state.customLogo = data.payload.customLogo;
                 if (window.applyDynamicBrandIcons) window.applyDynamicBrandIcons(state.customLogo || null);
               }
-              if (notify) showToast('已同步最新課程與開放時段');
+              if (notify) showToast('已同步最新課程與可用時段');
             }
           } catch (e) {
             cloudConnected.value = false;
-            if (notify) showToast('尚未執行 SQL 建表，目前為本機安全模式', 'error');
+            if (notify) showToast('目前為本機安全模式', 'error');
           }
         };
 
         const getPublicPayloadSnapshot = () => ({
           courses: JSON.parse(JSON.stringify(state.courses)),
           slots: JSON.parse(JSON.stringify(state.slots)),
+          busyIntervals: JSON.parse(JSON.stringify(state.busyIntervals)),
           bankInfo: state.bankInfo,
           bankAccount: state.bankAccount,
-          customLogo: state.customLogo
+          customLogo: state.customLogo,
+          bufferMinutes: Number(state.bufferMinutes) || 0
         });
 
         const savePublicConfig = async (notify = false) => {
@@ -1217,10 +1413,30 @@
           if (notify) showToast('設定已加密同步至雲端');
         };
 
-        const submitBooking = async () => {
-          if (!form.slotId) return showToast('請先在月曆選擇日期與預約時段', 'error');
-          if (!form.courseId) return showToast('請選擇預約課程', 'error');
-          if (form.locationType === 'home' && !form.address) return showToast('請填寫到府服務地址', 'error');
+        // 送出單筆或多筆預約（自動扣除課程時長＋緩衝時間所佔用的後續時段）
+        const submitAllBookings = async () => {
+          const itemsToSubmit = [...bookingCart.value];
+          if (selectedSlotObj.value && selectedCoursesList.value.length > 0) {
+            if (form.locationType === 'home' && !form.address) return showToast('請填寫到府服務地址', 'error');
+            const startMin = timeToMinutes(selectedSlotObj.value.time);
+            const buffer = Number(state.bufferMinutes) || 0;
+            itemsToSubmit.push({
+              id: 'b_' + Date.now() + '_' + Math.random().toString(36).slice(2, 5),
+              slotId: selectedSlotObj.value.id,
+              date: selectedSlotObj.value.date,
+              time: selectedSlotObj.value.time,
+              endTime: minutesToTime(startMin + totalSelectedDuration.value),
+              startMin,
+              endMin: startMin + totalSelectedDuration.value + buffer,
+              courseName: selectedCoursesSummaryName.value,
+              duration: totalSelectedDuration.value,
+              price: totalSelectedPrice.value,
+              locationType: form.locationType,
+              address: form.locationType === 'home' ? form.address : '台中市北屯區遼陽四街39號3樓'
+            });
+          }
+
+          if (itemsToSubmit.length === 0) return showToast('請先在月曆選擇預約日期與時段', 'error');
           if (!form.customerName) return showToast('請填寫預約人姓名', 'error');
           if (!/^09\d{8}$/.test(form.phone)) return showToast('請輸入正確的 10 碼手機號碼（09開頭）', 'error');
           if (!form.depositLast4) return showToast('請填寫訂金匯款後 4 碼', 'error');
@@ -1228,59 +1444,58 @@
           submitting.value = true;
           if (supabaseClient && cloudConnected.value) await syncPublicData(false);
 
-          const slot = state.slots.find(s => s.id === form.slotId);
-          if (!slot || slot.isBooked) {
-            submitting.value = false;
-            return showToast('此時段剛被其他貴賓預約，請重選時段', 'error');
-          }
-          const course = state.courses.find(c => c.id === form.courseId);
-
-          const bookingObj = {
-            id: 'b_' + Date.now(),
-            slotId: slot.id,
-            date: slot.date,
-            time: slot.time,
-            courseName: course.name,
-            duration: course.duration,
-            price: course.price,
-            locationType: form.locationType,
-            address: form.locationType === 'home' ? form.address : '台中市北屯區遼陽四街39號3樓',
+          const finalBookings = itemsToSubmit.map(item => ({
+            ...item,
             customerName: form.customerName,
             phone: form.phone,
             customerNote: form.customerNote,
             depositLast4: form.depositLast4,
             paymentStatus: 'unpaid',
             createdAt: new Date().toISOString()
-          };
+          }));
+
+          const slotIds = finalBookings.map(b => b.slotId);
+          const newIntervals = finalBookings.map(b => ({
+            bookingId: b.id,
+            date: b.date,
+            startMin: b.startMin,
+            endMin: b.endMin
+          }));
 
           if (supabaseClient && cloudConnected.value) {
-            const { data, error } = await supabaseClient.rpc('public_submit_booking_v2', {
-              p_booking: bookingObj,
-              p_slot_id: slot.id
+            const { data, error } = await supabaseClient.rpc('public_submit_bookings_v3', {
+              p_bookings: finalBookings,
+              p_booked_slot_ids: slotIds
             });
             if (error || !data) {
               submitting.value = false;
-              return showToast('此時段剛被搶先預約，請重選時段', 'error');
+              return showToast('所選時段剛被搶先預約，請重新確認檔期', 'error');
             }
+            // 將佔用時間區間同步寫入公開設定，讓所有用戶立即扣除該時長區間
+            state.busyIntervals.push(...newIntervals);
             await syncPublicData(false);
-            const maskedBooking = {
-              ...bookingObj,
-              address: bookingObj.locationType === 'home' ? bookingObj.address.slice(0, 6) + '********' : bookingObj.address
-            };
-            lookedUpResults.value = [maskedBooking];
+            lookedUpResults.value = finalBookings.map(b => ({
+              ...b,
+              address: b.locationType === 'home' ? b.address.slice(0, 6) + '********' : b.address
+            }));
           } else {
-            slot.isBooked = true;
-            state.bookings.push(bookingObj);
+            slotIds.forEach(sid => {
+              const s = state.slots.find(item => item.id === sid);
+              if (s) s.isBooked = true;
+            });
+            state.busyIntervals.push(...newIntervals);
+            state.bookings.push(...finalBookings);
           }
 
           lookupForm.name = form.customerName;
           lookupForm.phone = form.phone;
           lookupSearched.value = true;
+          bookingCart.value = [];
           form.slotId = '';
           form.depositLast4 = '';
           form.customerNote = '';
           submitting.value = false;
-          showToast('預約成功！已為您跳轉至預約明細');
+          showToast(`已成功送出 ${finalBookings.length} 筆預約！`);
           view.value = 'lookup';
         };
 
@@ -1369,7 +1584,18 @@
             p_token: adminSessionToken.value
           });
           if (data) {
-            if (Array.isArray(data.bookings)) state.bookings = data.bookings;
+            if (Array.isArray(data.bookings)) {
+              state.bookings = data.bookings;
+              // 同步校正佔用時間區間，確保所有有效訂單皆有完整時間扣除
+              const buffer = Number(state.bufferMinutes) || 0;
+              state.busyIntervals = data.bookings.map(b => {
+                const sMin = typeof b.startMin === 'number' ? b.startMin : timeToMinutes(b.time);
+                const dur = Number(b.duration) || 60;
+                const eMin = typeof b.endMin === 'number' ? b.endMin : (sMin + dur + buffer);
+                return { bookingId: b.id, date: b.date, startMin: sMin, endMin: eMin };
+              });
+              await savePublicConfig(false);
+            }
             if (Array.isArray(data.admins)) cloudAdminUsernames.value = data.admins;
             if (notify) showToast('已同步最新訂單與帳務');
           }
@@ -1444,10 +1670,12 @@
           showToast('已更新收款狀態');
         };
 
+        // 刪除訂單並自動釋放該訂單佔用的所有時間區間
         const deleteBooking = async (b) => {
           const slot = state.slots.find(s => s.id === b.slotId);
           if (slot) slot.isBooked = false;
           state.bookings = state.bookings.filter(item => item.id !== b.id);
+          state.busyIntervals = state.busyIntervals.filter(iv => iv.bookingId !== b.id && !(iv.date === b.date && iv.startMin === timeToMinutes(b.time)));
           if (supabaseClient && cloudConnected.value) {
             await supabaseClient.rpc('admin_delete_booking_v2', {
               p_token: adminSessionToken.value,
@@ -1455,7 +1683,7 @@
             });
             await savePublicConfig(false);
           }
-          showToast('已刪除訂單並釋出時段');
+          showToast('已刪除訂單並釋出佔用時段');
         };
 
         const addCourse = async () => {
@@ -1465,6 +1693,7 @@
 
         const removeCourse = async (id) => {
           state.courses = state.courses.filter(c => c.id !== id);
+          form.courseIds = form.courseIds.filter(cid => cid !== id);
           await savePublicConfig(false);
         };
 
@@ -1529,7 +1758,7 @@
           const url = URL.createObjectURL(blob);
           const a = document.createElement('a');
           a.href = url;
-          a.download = `willa-beauty-life-v2-backup-${new Date().toISOString().slice(0, 10)}.json`;
+          a.download = `willa-beauty-life-v3-backup-${new Date().toISOString().slice(0, 10)}.json`;
           a.click();
           URL.revokeObjectURL(url);
           showToast('備份檔案已下載');
@@ -1561,14 +1790,17 @@
 
         return {
           view, adminTab, loadingCloud, submitting, lookingUp, loggingIn, showLoginPwd, cloudConnected, isAdminLoggedIn, currentAdminUser,
-          lockCountdown, toast, state, form, lookupForm, lookupSearched, loginForm, pwdForm, newAdmin,
+          lockCountdown, toast, state, form, bookingCart, pendingSubmissionCount, cartGrandTotal,
+          lookupForm, lookupSearched, loginForm, pwdForm, newAdmin,
           calYear, calMonth, selectedDate, calendarCells, changeMonth, selectCalendarDate, slotsForSelectedDate,
-          categories, selectedCategory, currentCategoryEn, filteredCourses, selectedSlotObj, selectedCourseObj, estimatedEndTime,
-          scrollToGuestForm, batchSlot, presetTimes, toggleWeekday, togglePresetTime, addCustomPresetTime, addBatchSlots,
+          categories, selectedCategory, currentCategoryEn, filteredCourses, toggleCourseSelection,
+          selectedSlotObj, selectedCoursesList, selectedCoursesSummaryName, totalSelectedPrice, totalSelectedDuration, estimatedEndTime,
+          scrollToGuestForm, addCurrentToBookingCart, removeFromCart, isSlotBlockedByBooking,
+          batchSlot, presetTimes, toggleWeekday, togglePresetTime, addCustomPresetTime, addBatchSlots,
           sortedSlots, sortedBookings, bookingFilters, bookingFilter, filteredAdminBookings, myBookings, adminList,
           currentMonthLabel, monthlyConfirmedRevenue, totalConfirmedRevenue,
-          paymentLabel, copyText, copyBookingReceipt, handleLogoUpload, resetDefaultLogo,
-          submitBooking, handleLookup, handleAdminLogin, logoutAdmin,
+          paymentLabel, copyText, copyBookingReceipt, copyAllLookupReceipts, handleLogoUpload, resetDefaultLogo,
+          submitAllBookings, handleLookup, handleAdminLogin, logoutAdmin,
           removeSlot, updateBookingPayment, deleteBooking, addCourse, removeCourse,
           changePassword, addAdminUser, removeAdmin, exportBackup, importBackup,
           syncPublicData, savePublicConfig, refreshAdminData
