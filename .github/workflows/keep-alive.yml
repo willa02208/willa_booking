@@ -14,6 +14,6 @@ jobs:
         run: |
           STATUS=$(curl -s -o /tmp/res.txt -w "%{http_code}" \
             -H "apikey: sb_publishable_oMQQWoZSHszuz8ZGDn5KOg_5AGaHA80" \
-            "https://alfyooickvvvmwoggqzm.supabase.co/rest/v1/willa_public?select=*&limit=1")
+            "https://alfyooickvvvmwoggqzm.supabase.co/rest/v1/keep_alive?select=id&limit=1")
           echo "Supabase 回應狀態碼: $STATUS"
           if [ "$STATUS" -ge 400 ]; then cat /tmp/res.txt; exit 1; fi
