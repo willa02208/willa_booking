@@ -1,0 +1,19 @@
+name: Keep Supabase Projects Alive
+
+on:
+  schedule:
+    # 每 3 天的台灣時間早上 09:00 自動執行（遠低於 7 天休眠限制）
+    - cron: '0 1 */3 * *'
+  workflow_dispatch: # 允許隨時在 GitHub 網頁手動點擊測試
+
+jobs:
+  wake-up-databases:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 喚醒【Booking】資料庫
+        run: |
+          STATUS=$(curl -s -o /tmp/res.txt -w "%{http_code}" \
+            -H "apikey: sb_publishable_oMQQWoZSHszuz8ZGDn5KOg_5AGaHA80" \
+            "https://alfyooickvvvmwoggqzm.supabase.co/rest/v1/willa_public?select=*&limit=1")
+          echo "Supabase 回應狀態碼: $STATUS"
+          if [ "$STATUS" -ge 400 ]; then cat /tmp/res.txt; exit 1; fi
